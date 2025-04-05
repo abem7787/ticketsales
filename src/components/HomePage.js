@@ -34,28 +34,28 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6">
       <div className="max-w-6xl mx-auto">
 
-              {/* Tickets Typography on the Left Side */}
-              <div className="flex justify-between items-center mb-4">
-  {/* Tickets Typography on the Left Side with Cursive Typography */}
-  <h1 className="text-4xl md:text-6xl font-bold mb-4  bg-opacity-50 p-4 rounded-lg inline-block"
-      style={{ fontFamily: 'Dancing Script, cursive' }}>
- <span style={{ fontFamily: 'Dancing Script, Pacifico' }}>Tickets</span>
-  </h1>
+        {/* Tickets Typography on the Left Side */}
+        <div className="flex justify-between items-center mb-4">
+          {/* Tickets Typography on the Left Side with Cursive Typography */}
+          <h1 className="text-4xl md:text-6xl font-bold mb-4  bg-opacity-50 p-4 rounded-lg inline-block"
+              style={{ fontFamily: 'Dancing Script, cursive' }}>
+            <span style={{ fontFamily: 'Dancing Script, Pacifico' }}>Tickets</span>
+          </h1>
 
-  {/* Sign In / Log In Section */}
-  <div className="flex space-x-4">
-    <Link to="/login">
-      <Button size="sm" className="text-xs px-2 py-1">
-        <LogIn className="mr-1 h-3 w-3" /> Login
-      </Button>
-    </Link>
-    <Link to="/register">
-      <Button size="sm" className="text-xs px-2 py-1">
-        <UserPlus className="mr-1 h-3 w-3" /> Sign Up
-      </Button>
-    </Link>
-  </div>
-</div>
+          {/* Sign In / Log In Section */}
+          <div className="flex space-x-4">
+            <Link to="/login">
+              <Button size="sm" className="text-xs px-2 py-1">
+                <LogIn className="mr-1 h-3 w-3" /> Login
+              </Button>
+            </Link>
+            <Link to="/register">
+              <Button size="sm" className="text-xs px-2 py-1">
+                <UserPlus className="mr-1 h-3 w-3" /> Sign Up
+              </Button>
+            </Link>
+          </div>
+        </div>
 
         {/* Navigation Header (Hotels, Sell, Promo, Help, VIP, PayPal, Crypto) */}
         <div className="flex justify-between items-center bg-gray-700 p-4 mb-3 text-slate-300">
@@ -83,8 +83,6 @@ export default function HomePage() {
           </div>
         </section>
 
-  
-
         {/* Header Section */}
         <header
           className="text-center py-20 bg-cover bg-center bg-no-repeat rounded-2xl shadow-lg"
@@ -103,7 +101,10 @@ export default function HomePage() {
           <SearchBar searchQuery={searchQuery} handleSearch={handleSearch} />
 
           <div className="mt-6">
-            <Button>Explore Events</Button>
+            {/* Link to /select-seats route */}
+            <Link to="/select-seats">
+              <Button>Explore Events</Button>
+            </Link>
           </div>
         </header>
 

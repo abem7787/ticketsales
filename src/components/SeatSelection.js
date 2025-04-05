@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate hook
 
 const SeatSelection = () => {
   // Mock seat data: 5 rows and 6 seats per row
@@ -7,6 +8,9 @@ const SeatSelection = () => {
 
   // State to hold selected seats
   const [selectedSeats, setSelectedSeats] = useState([]);
+
+  // Initialize the useNavigate hook
+  const navigate = useNavigate();
 
   // Seat click handler
   const handleSeatClick = (seatId) => {
@@ -28,6 +32,13 @@ const SeatSelection = () => {
       seatGrid.push(seatId);
     }
   }
+
+  // Confirm selection and navigate to payment page
+  const handleConfirmSelection = () => {
+    alert(`Selected Seats: ${selectedSeats.join(', ')}`);
+    // Navigate to the payment page
+    navigate('/payment');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 flex justify-center items-center">
@@ -52,7 +63,7 @@ const SeatSelection = () => {
           })}
         </div>
         <button
-          onClick={() => alert(`Selected Seats: ${selectedSeats.join(', ')}`)}
+          onClick={handleConfirmSelection}  // Use the handler to navigate
           className="w-full py-2 text-xl bg-indigo-600 hover:bg-indigo-700 rounded-md"
         >
           Confirm Selection
