@@ -1,10 +1,36 @@
 // src/components/HomePage.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Ticket, Star, Users, Percent } from 'lucide-react';
 import { Card, CardContent } from './card';  // Import from the same folder
 import { Button } from './button';  // Import from the same folder
+import SearchBar from './SearchBar';  // Import SearchBar component
+
+
+const eventsData = [
+  { id: 1, title: 'Concert - The Weekend', description: 'Enjoy live music from The Weekend!', image: 'https://example.com/image1.jpg' },
+  { id: 2, title: 'Theater Show - Hamilton', description: 'A broadway show about American history', image: 'https://example.com/image2.jpg' },
+  { id: 3, title: 'Sports - Basketball Finals', description: 'Watch the live finals!', image: 'https://example.com/image3.jpg' },
+  { id: 4, title: 'Comedy Night', description: 'Get ready for a night of laughter!', image: 'https://example.com/image4.jpg' },
+];
+
 
 export default function HomePage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredEvents, setFilteredEvents] = useState(eventsData);
+
+  // Search handler
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
+    useEffect(() => {
+    // Filter events based on search query
+    const results = eventsData.filter((event) =>
+      event.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredEvents(results);
+  }, [searchQuery]);
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6">
       <div className="max-w-6xl mx-auto">
@@ -13,6 +39,8 @@ export default function HomePage() {
           <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto">
             Seamlessly browse, purchase, and manage tickets for concerts, sports, theater shows, and more.
           </p>
+            {/* Search Bar */}
+            <SearchBar searchQuery={searchQuery} handleSearch={handleSearch} />
           <div className="mt-6">
             <Button>Explore Events</Button>
           </div>
