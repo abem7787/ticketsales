@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-
 const Footer = () => {
   return (
     <footer className="bg-slate-900 text-slate-400 mt-24 pt-12 pb-6 px-6 text-sm">
@@ -41,6 +40,7 @@ const Footer = () => {
             <li><a href="#" className="hover:text-white">Refunds and Exchanges</a></li>
             <li><a href="#" className="hover:text-white">Do Not Sell or Share My Info</a></li>
             <li><Link to="/admin-login" className="hover:text-white">Admin Login</Link></li> 
+            <li><a href="rightangletechs.com" className="hover:text-white">Web Developer</a></li> {/* Added your website */}
           </ul>
         </div>
 
