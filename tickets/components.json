@@ -1,0 +1,5 @@
+{
+    "card": "src/components/ui/card.js",
+    "button": "src/components/ui/button.js"
+  }
+  
