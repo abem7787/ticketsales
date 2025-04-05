@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaTachometerAlt, FaTicketAlt, FaGift, FaUserShield } from 'react-icons/fa';
+import AdminTickets from '../components/AdminTickets'; // ✅ Import the component
 
 const AdminDashboard = () => {
   return (
@@ -33,15 +34,15 @@ const AdminDashboard = () => {
               <span>Refunds</span>
             </Link>
           </li>
-          {/* Add more sidebar links here */}
         </ul>
       </div>
 
       {/* Main Content Area */}
       <div className="flex-1 bg-slate-700 p-8">
         <h2 className="text-2xl text-white mb-6">Welcome to the Admin Dashboard</h2>
+
+        {/* Dashboard Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Dashboard Cards */}
           <div className="bg-slate-800 p-6 rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold text-white mb-2">Total Tickets Sold</h3>
             <p className="text-lg text-white">1234</p>
@@ -55,6 +56,8 @@ const AdminDashboard = () => {
             <p className="text-lg text-white">5</p>
           </div>
         </div>
+
+        {/* Recent Activities */}
         <div className="mt-8">
           <h3 className="text-xl text-white mb-4">Recent Activities</h3>
           <ul className="space-y-4 text-white">
@@ -70,8 +73,13 @@ const AdminDashboard = () => {
               <p className="font-semibold">Refund request for order #123456</p>
               <p className="text-sm">30 minutes ago</p>
             </li>
-            {/* More activity items */}
           </ul>
+        </div>
+
+        {/* AdminTickets Table Section */}
+        <div className="mt-12">
+          <h3 className="text-xl text-white mb-4">Ticket List</h3>
+          <AdminTickets /> {/* ✅ Inject the table component here */}
         </div>
       </div>
     </div>

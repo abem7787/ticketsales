@@ -11,7 +11,7 @@ import PaymentForm from "./components/PaymentForm"
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import Purchase from './components/Purchase';
-
+import AdminTickets from './components/AdminTickets';
 
 const stripePromise = loadStripe('your-public-key');  // Replace with your actual Stripe public key
 
@@ -29,7 +29,7 @@ function App() {
         <Route path="/select-seats" element={<SeatSelection />} />
         <Route path="/payment" element={<PaymentForm />} />  {/* Add your PaymentForm route */}
         <Route path="/purchase/:eventId" element={<Purchase />} />
-
+        <Route path="/admin/tickets" element={<AdminTickets />} />
       </Routes>
     </Elements>
   
