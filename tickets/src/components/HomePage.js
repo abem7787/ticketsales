@@ -4,7 +4,7 @@ import { Card, CardContent } from './card';  // Import from the same folder
 import { Button } from './button';  // Import from the same folder
 import SearchBar from './SearchBar';  // Import SearchBar component
 import { Link } from 'react-router-dom';
-import Footer from "../components/footer"
+import Footer from "../components/footer";
 
 const eventsData = [
   { id: 1, title: 'Concert - The Weekend', description: 'Enjoy live music from The Weekend!', image: 'https://example.com/image1.jpg' },
@@ -34,20 +34,28 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6">
       <div className="max-w-6xl mx-auto">
 
-         {/* Sign In / Log In Section */}
-         <div className="flex justify-end space-x-4 mt-4 mb-4">
-  <Link to="/login">
-    <Button size="sm" className="text-xs px-2 py-1">
-      <LogIn className="mr-1 h-3 w-3" /> Login
-    </Button>
-  </Link>
-  <Link to="/register">
-    <Button size="sm" className="text-xs px-2 py-1">
-      <UserPlus className="mr-1 h-3 w-3" /> Sign Up
-    </Button>
-  </Link>
-</div>
+              {/* Tickets Typography on the Left Side */}
+              <div className="flex justify-between items-center mb-4">
+  {/* Tickets Typography on the Left Side with Cursive Typography */}
+  <h1 className="text-4xl md:text-6xl font-bold mb-4  bg-opacity-50 p-4 rounded-lg inline-block"
+      style={{ fontFamily: 'Dancing Script, cursive' }}>
+ <span style={{ fontFamily: 'Dancing Script, Pacifico' }}>Tickets</span>
+  </h1>
 
+  {/* Sign In / Log In Section */}
+  <div className="flex space-x-4">
+    <Link to="/login">
+      <Button size="sm" className="text-xs px-2 py-1">
+        <LogIn className="mr-1 h-3 w-3" /> Login
+      </Button>
+    </Link>
+    <Link to="/register">
+      <Button size="sm" className="text-xs px-2 py-1">
+        <UserPlus className="mr-1 h-3 w-3" /> Sign Up
+      </Button>
+    </Link>
+  </div>
+</div>
 
         {/* Navigation Header (Hotels, Sell, Promo, Help, VIP, PayPal, Crypto) */}
         <div className="flex justify-between items-center bg-gray-700 p-4 mb-3 text-slate-300">
@@ -74,10 +82,12 @@ export default function HomePage() {
             <Button>Family</Button>
           </div>
         </section>
-        
+
+  
+
         {/* Header Section */}
         <header
-          className="text-center py-20 bg-cover bg-center bg-no-repeat rounded-2xl shadow-lg "
+          className="text-center py-20 bg-cover bg-center bg-no-repeat rounded-2xl shadow-lg"
           style={{
             backgroundImage: "url(https://images.pexels.com/photos/8512406/pexels-photo-8512406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)"
           }}
