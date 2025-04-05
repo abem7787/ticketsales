@@ -4,8 +4,7 @@ import { Card, CardContent } from './card';  // Import from the same folder
 import { Button } from './button';  // Import from the same folder
 import SearchBar from './SearchBar';  // Import SearchBar component
 import { Link } from 'react-router-dom';
-
-
+import Footer from "../components/footer"
 
 const eventsData = [
   { id: 1, title: 'Concert - The Weekend', description: 'Enjoy live music from The Weekend!', image: 'https://example.com/image1.jpg' },
@@ -36,8 +35,7 @@ export default function HomePage() {
       <div className="max-w-6xl mx-auto">
 
          {/* Sign In / Log In Section */}
-        <div className="mt-8 flex justify-end space-x-4">
-        <div className="absolute top-4 right-4 z-10 flex space-x-2">
+         <div className="flex justify-end space-x-4 mt-4 mb-4">
   <Link to="/login">
     <Button size="sm" className="text-xs px-2 py-1">
       <LogIn className="mr-1 h-3 w-3" /> Login
@@ -50,9 +48,9 @@ export default function HomePage() {
   </Link>
 </div>
 
-</div>
+
         {/* Navigation Header (Hotels, Sell, Promo, Help, VIP, PayPal, Crypto) */}
-        <div className="flex justify-between items-center bg-gray-700 p-4 text-slate-300">
+        <div className="flex justify-between items-center bg-gray-700 p-4 mb-3 text-slate-300">
           <div className="flex space-x-4">
             <a href="#hotels" className="hover:text-white">Hotels</a>
             <a href="#sell" className="hover:text-white">Sell</a>
@@ -67,7 +65,7 @@ export default function HomePage() {
         </div>
 
         {/* Event Category Tabs */}
-        <section className="text-center mt-12">
+        <section className="text-center mb-3">
           <div className="flex justify-center space-x-8 text-lg">
             <Button>Concert</Button>
             <Button>Sports</Button>
@@ -78,28 +76,26 @@ export default function HomePage() {
         </section>
         
         {/* Header Section */}
-       <header
-  className="text-center py-20 bg-cover bg-center bg-no-repeat rounded-2xl shadow-lg "
-  style={{
-    backgroundImage: "url(https://images.pexels.com/photos/8512406/pexels-photo-8512406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)"
-  }}
->
-  <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-black bg-opacity-50 p-4 rounded-lg inline-block">
-    Welcome to Tickets
-  </h1>
-  <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto bg-black bg-opacity-40 p-2 rounded-lg">
-    Seamlessly browse, purchase, and manage tickets for concerts, sports, theater shows, and more.
-  </p>
+        <header
+          className="text-center py-20 bg-cover bg-center bg-no-repeat rounded-2xl shadow-lg "
+          style={{
+            backgroundImage: "url(https://images.pexels.com/photos/8512406/pexels-photo-8512406.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)"
+          }}
+        >
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-black bg-opacity-50 p-4 rounded-lg inline-block">
+            Welcome to Tickets
+          </h1>
+          <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto bg-black bg-opacity-40 p-2 rounded-lg">
+            Seamlessly browse, purchase, and manage tickets for concerts, sports, theater shows, and more.
+          </p>
 
-  {/* Search Bar */}
-  <SearchBar searchQuery={searchQuery} handleSearch={handleSearch} />
+          {/* Search Bar */}
+          <SearchBar searchQuery={searchQuery} handleSearch={handleSearch} />
 
-  <div className="mt-6">
-    <Button>Explore Events</Button>
-  </div>
-</header>
-
-
+          <div className="mt-6">
+            <Button>Explore Events</Button>
+          </div>
+        </header>
 
         {/* Event Cards */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
@@ -159,9 +155,7 @@ export default function HomePage() {
           </Card>
         </section>
 
-        <footer className="text-center mt-24 text-slate-500">
-          <p>&copy; 2025 EventVerse. All rights reserved.</p>
-        </footer>
+        <Footer />
       </div>
     </div>
   );
