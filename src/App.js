@@ -12,6 +12,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import Purchase from './components/Purchase';
 import AdminTickets from './components/AdminTickets';
+import QRCodeDisplay from './components/QRCodeDisplay'; // Import the new component for QR code display
 
 const stripePromise = loadStripe('your-public-key');  // Replace with your actual Stripe public key
 
@@ -30,6 +31,7 @@ function App() {
         <Route path="/payment" element={<PaymentForm />} />  {/* Add your PaymentForm route */}
         <Route path="/purchase/:eventId" element={<Purchase />} />
         <Route path="/admin/tickets" element={<AdminTickets />} />
+        <Route path="/admin/QRCodeDisplay" element={< QRCodeDisplay/>} />
       </Routes>
     </Elements>
   
