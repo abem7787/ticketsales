@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button, Typography, FormControl, RadioGroup, FormControlLabel, Radio, Box, Grid, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import QRCode from 'qrcode.react';  // Import the QRCode library
 
 const PaymentForm = ({ total, eventId, onSuccess }) => {
   const stripe = useStripe();
@@ -14,6 +15,7 @@ const PaymentForm = ({ total, eventId, onSuccess }) => {
     lastName: '',
     address: '',
     city: '',
+    password: '',  // Added password field
   });
 
   const handleInputChange = (event) => {
@@ -45,10 +47,7 @@ const PaymentForm = ({ total, eventId, onSuccess }) => {
       if (error) {
         console.error(error);
       } else {
-        // Send paymentMethod.id to your backend for further processing
         onSuccess(stripePaymentMethod.id);
-
-        // Route the user to the Purchase page with the event details
         navigate(`/purchase/${eventId}`, {
           state: {
             customerName: `${formData.firstName} ${formData.lastName}`,
@@ -58,14 +57,16 @@ const PaymentForm = ({ total, eventId, onSuccess }) => {
         });
       }
     } else if (paymentMethod === 'crypto') {
-      // Handle crypto payment here (e.g., redirect to a crypto payment gateway)
-      window.location.href = 'https://www.coinbase.com/checkout/xyz'; // Replace with actual crypto checkout URL
+      window.location.href = 'https://www.coinbase.com/checkout/xyz';  // Replace with actual crypto checkout URL
     }
   };
 
   const handleChange = (event) => {
     setPaymentMethod(event.target.value);
   };
+
+  // Combine the first name, last name, and password for QR code generation
+  const qrCodeData = `${formData.firstName} ${formData.lastName} - ${formData.password}`;
 
   return (
     <div className="payment-form-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', padding: '20px', flexDirection: 'column' }}>
@@ -93,6 +94,7 @@ const PaymentForm = ({ total, eventId, onSuccess }) => {
               <TextField label="Last Name" variant="outlined" fullWidth name="lastName" value={formData.lastName} onChange={handleInputChange} style={{ marginBottom: '10px' }} />
               <TextField label="Address" variant="outlined" fullWidth name="address" value={formData.address} onChange={handleInputChange} style={{ marginBottom: '10px' }} />
               <TextField label="City" variant="outlined" fullWidth name="city" value={formData.city} onChange={handleInputChange} style={{ marginBottom: '10px' }} />
+              <TextField label="Password" variant="outlined" fullWidth name="password" value={formData.password} onChange={handleInputChange} style={{ marginBottom: '10px' }} />
 
               <CardElement />
               <Button type="submit" variant="contained" color="primary" disabled={!stripe} fullWidth style={{ marginTop: '20px' }}>
@@ -101,6 +103,16 @@ const PaymentForm = ({ total, eventId, onSuccess }) => {
             </Box>
           </Grid>
         </Grid>
+
+        {/* QR Code Display */}
+        {formData.firstName && formData.lastName && formData.password && (
+          <Box mt={4} style={{ textAlign: 'center' }}>
+            <Typography variant="h6" gutterBottom>
+              Your QR Code:
+            </Typography>
+            <QRCode value={qrCodeData} size={256} />
+          </Box>
+        )}
       </form>
     </div>
   );
