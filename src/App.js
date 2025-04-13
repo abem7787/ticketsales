@@ -5,6 +5,7 @@ import logo from './img/logo.png';
 import image1 from './img/image1.jpg';
 import image2 from './img/image2.jpg';
 import image3 from './img/image3.jpg';
+
 const image4 = 'https://via.placeholder.com/600x400?text=Image+4';
 const image5 = 'https://via.placeholder.com/600x400?text=Image+5';
 const qrCode = 'https://api.qrserver.com/v1/create-qr-code/?data=Ticket123456&size=150x150';
@@ -48,7 +49,7 @@ export default function Home() {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
-            className="text-6xl md:text-8xl font-bold text-red-500"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-red-500"
           >
             TicketsToMyShow.com
           </motion.h1>
@@ -56,7 +57,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5 }}
-            className="text-xl md:text-3xl mt-4 text-gray-300"
+            className="text-lg sm:text-xl md:text-2xl mt-4 text-gray-300"
           >
             Where Every Seat Has a Story.
           </motion.p>
@@ -91,7 +92,7 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* Features Cards */}
+        {/* Feature Cards */}
         <section className="py-24 px-6 bg-black flex flex-col gap-20">
           {[...Array(3)].map((_, index) => (
             <motion.div
@@ -118,7 +119,7 @@ export default function Home() {
           ))}
         </section>
 
-        {/* Cool Ticket Graphic */}
+        {/* Ticket Graphic Section */}
         <section className="py-24 px-6 bg-gradient-to-b from-gray-900 to-black text-center flex flex-col items-center">
           <motion.h2
             className="text-4xl md:text-6xl font-extrabold text-yellow-400 mb-10"
@@ -172,7 +173,6 @@ export default function Home() {
             Need help launching your next outdoor festival or warehouse rave? We’ve got the tech, team, and tools to make it happen. Contact us today.
           </motion.div>
         </section>
-        
       </div>
 
       {/* Footer */}
