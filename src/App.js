@@ -172,6 +172,7 @@ export default function Home() {
             Need help launching your next outdoor festival or warehouse rave? We’ve got the tech, team, and tools to make it happen. Contact us today.
           </motion.div>
         </section>
+        
       </div>
 
       {/* Footer */}
