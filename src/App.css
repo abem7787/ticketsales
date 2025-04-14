@@ -44,7 +44,6 @@
 }
 
 /* === FIX FOR WHITE LINE / HORIZONTAL SCROLL === */
-
 html, body {
   overflow-x: hidden;
   margin: 0;

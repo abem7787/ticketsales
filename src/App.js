@@ -31,7 +31,7 @@ export default function Home() {
     <main className="bg-black text-white min-h-screen flex flex-col">
       {/* Navigation Bar */}
       <nav className="bg-black text-white py-4 px-6 flex flex-col md:flex-row justify-between items-center">
-        <div className="flex items-center mb-4 md:mb-0">
+        <div className="dflex items-center mb-4 md:mb-0">
           <img src={logo} alt="Logo" className="h-20 md:h-24 w-auto mr-4" />
         </div>
         <ul className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8 text-center md:text-left">
