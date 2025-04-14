@@ -1,9 +1,9 @@
-/* index.css or App.css */
+/* Tailwind base styles */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
+/* App styles */
 .App {
   text-align: center;
 }
@@ -41,4 +41,17 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* === FIX FOR WHITE LINE / HORIZONTAL SCROLL === */
+
+html, body {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+}
+
+#root {
+  overflow-x: hidden;
 }
