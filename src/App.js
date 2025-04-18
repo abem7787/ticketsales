@@ -1,21 +1,83 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import './App.css';
 import logo from './img/logo.png';
 import image1 from './img/stage.png';
 import image2 from './img/image2.jpg';
 import image3 from './img/image3.jpg';
-import { FaBars } from 'react-icons/fa';
+import { FaBars, FaTicketAlt, FaMusic, FaCalendarAlt, FaStar } from 'react-icons/fa';
+import { GiTicket, GiMicrophone, GiTheaterCurtains } from 'react-icons/gi';
 
 const image4 = 'https://via.placeholder.com/600x400?text=Image+4';
 const image5 = 'https://via.placeholder.com/600x400?text=Image+5';
 const qrCode = 'https://api.qrserver.com/v1/create-qr-code/?data=Ticket123456&size=150x150';
+
+// Floating graphic components
+const FloatingTicket = ({ scrollYProgress }) => {
+  const x = useTransform(scrollYProgress, [0, 1], [0, 200]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, 45]);
+  
+  return (
+    <motion.div 
+      className="absolute text-yellow-400 text-6xl opacity-70"
+      style={{ x, y, rotate, left: '10%', top: '20%' }}
+    >
+      <FaTicketAlt />
+    </motion.div>
+  );
+};
+
+const BouncingMusicNote = ({ scrollYProgress }) => {
+  const y = useTransform(scrollYProgress, [0, 0.5, 1], [0, -100, 50]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.5, 1]);
+  
+  return (
+    <motion.div 
+      className="absolute text-red-500 text-5xl"
+      style={{ y, scale, right: '15%', top: '40%' }}
+    >
+      <FaMusic />
+    </motion.div>
+  );
+};
+
+const RotatingStage = ({ scrollYProgress }) => {
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
+  const scale = useTransform(scrollYProgress, [0, 0.3, 0.6, 1], [0.5, 1.2, 0.8, 1]);
+  
+  return (
+    <motion.div 
+      className="absolute text-white text-7xl opacity-60"
+      style={{ rotate, scale, left: '30%', bottom: '10%' }}
+    >
+      <GiMicrophone />
+    </motion.div>
+  );
+};
+
+const Sparkle = ({ scrollYProgress }) => {
+  const x = useTransform(scrollYProgress, [0, 1], [0, Math.random() * 200 - 100]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, Math.random() * 200 - 100]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 0]);
+  
+  return (
+    <motion.div 
+      className="absolute text-yellow-300"
+      style={{ x, y, scale, left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
+    >
+      <FaStar />
+    </motion.div>
+  );
+};
 
 export default function Home() {
   const images = [image1, image2, image3, image4, image5];
   const [ticketCount, setTicketCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showGraphics, setShowGraphics] = useState(false);
+  const { scrollYProgress } = useScroll();
 
   useEffect(() => {
     let counter = 0;
@@ -34,6 +96,11 @@ export default function Home() {
       } else {
         setScrolled(false);
       }
+      if (window.scrollY > 200) {
+        setShowGraphics(true);
+      } else {
+        setShowGraphics(false);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -45,8 +112,38 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="bg-black text-white min-h-screen flex flex-col font-sans">
-      {/* Navigation Bar with Large Logo */}
+    <main className="bg-black text-white min-h-screen flex flex-col font-sans overflow-hidden">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <AnimatePresence>
+          {showGraphics && (
+            <>
+              <FloatingTicket scrollYProgress={scrollYProgress} />
+              <BouncingMusicNote scrollYProgress={scrollYProgress} />
+              <RotatingStage scrollYProgress={scrollYProgress} />
+              {[...Array(20)].map((_, i) => (
+                <Sparkle key={i} scrollYProgress={scrollYProgress} />
+              ))}
+            </>
+          )}
+        </AnimatePresence>
+        
+        {/* Pulse effect */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-radial from-yellow-400/10 to-transparent"
+          animate={{
+            scale: [1, 1.5, 1],
+            opacity: [0.1, 0.3, 0.1]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      </div>
+
+      {/* Navigation Bar */}
       <nav className={`fixed w-full bg-black/90 backdrop-blur-sm text-white py-5 px-8 flex justify-between items-center z-50 transition-all duration-300 ${scrolled ? 'shadow-xl' : ''}`}>
         <motion.div 
           className="flex items-center"
@@ -57,7 +154,7 @@ export default function Home() {
           <img 
             src={logo} 
             alt="Logo" 
-            className="h-40 md:h-60 w-auto mr-6 transition-all duration-300"  // Increased logo size
+            className="h-40 md:h-60 w-auto mr-6 transition-all duration-300"
           />
         </motion.div>
 
@@ -97,10 +194,55 @@ export default function Home() {
         </motion.ul>
       </nav>
 
-      {/* Main Content with adjusted padding for larger logo */}
-      <div className="flex-grow pt-32 md:pt-40"> {/* Increased top padding */}
+      {/* Main Content */}
+      <div className="flex-grow pt-32 md:pt-40 relative z-10">
         {/* Hero Section */}
-        <section id="home" className="h-screen flex flex-col justify-center items-center text-center px-6 pt-0">
+        <section id="home" className="h-screen flex flex-col justify-center items-center text-center px-6 pt-0 relative">
+          {/* Confetti effect on scroll */}
+          <AnimatePresence>
+            {showGraphics && (
+              <motion.div 
+                className="absolute inset-0 overflow-hidden pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                {[...Array(30)].map((_, i) => {
+                  const x = Math.random() * 100;
+                  const y = Math.random() * 100 - 50;
+                  const delay = Math.random() * 0.5;
+                  const duration = 1 + Math.random() * 2;
+                  const icon = [FaTicketAlt, FaMusic, GiTicket, GiTheaterCurtains][Math.floor(Math.random() * 4)];
+                  const IconComponent = icon;
+                  const colors = ['text-yellow-400', 'text-red-500', 'text-white', 'text-purple-400'];
+                  const color = colors[Math.floor(Math.random() * colors.length)];
+                  
+                  return (
+                    <motion.div
+                      key={i}
+                      className={`absolute ${color} text-2xl`}
+                      style={{ left: `${x}%`, top: `${y}%` }}
+                      initial={{ y: -100, opacity: 0 }}
+                      animate={{ 
+                        y: [y, y + 200],
+                        opacity: [0, 1, 0],
+                        rotate: [0, 360]
+                      }}
+                      transition={{ 
+                        delay,
+                        duration,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }}
+                    >
+                      <IconComponent />
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <motion.h1
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -120,7 +262,50 @@ export default function Home() {
         </section>
 
         {/* Events Section */}
-        <section id="events" className="min-h-screen bg-gradient-to-b from-black to-gray-900/80 py-28 px-6 flex flex-col items-center">
+        <section id="events" className="min-h-screen bg-gradient-to-b from-black to-gray-900/80 py-28 px-6 flex flex-col items-center relative">
+          {/* Floating event icons */}
+          <AnimatePresence>
+            {showGraphics && (
+              <motion.div 
+                className="absolute inset-0 overflow-hidden pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.6 }}
+                transition={{ duration: 1 }}
+              >
+                {['concerts', 'festivals', 'theater'].map((type, i) => {
+                  const icons = {
+                    concerts: <GiMicrophone className="text-red-500" />,
+                    festivals: <FaMusic className="text-yellow-400" />,
+                    theater: <GiTheaterCurtains className="text-purple-400" />
+                  };
+                  const x = 10 + (i * 30);
+                  const delay = i * 0.2;
+                  
+                  return (
+                    <motion.div
+                      key={type}
+                      className="absolute text-5xl"
+                      style={{ left: `${x}%`, top: '30%' }}
+                      initial={{ y: -50, opacity: 0 }}
+                      animate={{ 
+                        y: [0, -30, 0],
+                        opacity: [0.6, 1, 0.6]
+                      }}
+                      transition={{ 
+                        delay,
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      {icons[type]}
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <motion.div 
             className="text-center"
             initial={{ opacity: 0 }}
@@ -166,7 +351,47 @@ export default function Home() {
         </section>
 
         {/* Sell Tickets Section */}
-        <section id="sell-tickets" className="min-h-screen py-28 px-6 bg-black flex flex-col items-center">
+        <section id="sell-tickets" className="min-h-screen py-28 px-6 bg-black flex flex-col items-center relative">
+          {/* Animated ticket graphics */}
+          <AnimatePresence>
+            {showGraphics && (
+              <motion.div 
+                className="absolute inset-0 overflow-hidden pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                {[...Array(5)].map((_, i) => {
+                  const x = Math.random() * 100;
+                  const y = Math.random() * 100;
+                  const delay = i * 0.3;
+                  const size = 3 + Math.random() * 4;
+                  
+                  return (
+                    <motion.div
+                      key={i}
+                      className="absolute text-yellow-400"
+                      style={{ left: `${x}%`, top: `${y}%`, fontSize: `${size}rem` }}
+                      initial={{ scale: 0, rotate: -45 }}
+                      animate={{ 
+                        scale: [0, 1, 0.8, 1],
+                        rotate: [-45, 0, 15, 0]
+                      }}
+                      transition={{ 
+                        delay,
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatType: "reverse"
+                      }}
+                    >
+                      <GiTicket />
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <motion.div
             className="text-center mb-20"
             initial={{ opacity: 0 }}
@@ -234,7 +459,49 @@ export default function Home() {
         </section>
 
         {/* Rentals Section */}
-        <section id="rentals" className="py-24 px-6 bg-gradient-to-b from-gray-900 to-black text-center flex flex-col items-center">
+        <section id="rentals" className="py-24 px-6 bg-gradient-to-b from-gray-900 to-black text-center flex flex-col items-center relative">
+          {/* Pulsing venue graphics */}
+          <AnimatePresence>
+            {showGraphics && (
+              <motion.div 
+                className="absolute inset-0 overflow-hidden pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.7 }}
+                transition={{ duration: 1 }}
+              >
+                {[...Array(8)].map((_, i) => {
+                  const x = Math.random() * 100;
+                  const y = Math.random() * 100;
+                  const delay = i * 0.2;
+                  const size = 2 + Math.random() * 3;
+                  const colors = ['text-red-500', 'text-yellow-400', 'text-white', 'text-purple-400'];
+                  const color = colors[Math.floor(Math.random() * colors.length)];
+                  
+                  return (
+                    <motion.div
+                      key={i}
+                      className={`absolute ${color}`}
+                      style={{ left: `${x}%`, top: `${y}%`, fontSize: `${size}rem` }}
+                      initial={{ scale: 0 }}
+                      animate={{ 
+                        scale: [0, 1.2, 0.8, 1],
+                        opacity: [0, 0.8, 0.6, 0.7]
+                      }}
+                      transition={{ 
+                        delay,
+                        duration: 3,
+                        repeat: Infinity,
+                        repeatType: "reverse"
+                      }}
+                    >
+                      <FaCalendarAlt />
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <motion.h2
             className="text-5xl md:text-7xl font-black text-yellow-400 mb-12 tracking-tight"
             initial={{ opacity: 0 }}
@@ -270,10 +537,10 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-black border-t border-gray-800 py-16 px-6">
+      <footer className="bg-black border-t border-gray-800 py-16 px-6 relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center mb-12">
-            <img src={logo} alt="Logo" className="h-24 w-auto mb-6 md:mb-0" /> {/* Larger footer logo */}
+            <img src={logo} alt="Logo" className="h-24 w-auto mb-6 md:mb-0" />
             <div className="flex space-x-8">
               {['About', 'Careers', 'Blog', 'Press'].map((item) => (
                 <a key={item} href="#" className="text-gray-400 hover:text-white transition-colors duration-300 font-light">
