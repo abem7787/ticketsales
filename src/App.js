@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import './App.css';
 import logo from './img/logo.png';
 import image1 from './img/image1.jpg';
+import crpyto from "./img/crypto.png"
 import image2 from './img/image2.jpg';
 import image3 from './img/image3.jpg';
 import stage from "./img/stage.png";
@@ -25,6 +26,7 @@ const FloatingTicket = ({ scrollYProgress }) => {
       style={{ x, y, rotate, left: '10%', top: '20%' }}
     >
       <FaTicketAlt />
+      
     </motion.div>
   );
 };
@@ -39,6 +41,7 @@ const BouncingMusicNote = ({ scrollYProgress }) => {
       style={{ y, scale, right: '15%', top: '40%' }}
     >
       <FaMusic />
+      
     </motion.div>
   );
 };
@@ -402,6 +405,76 @@ export default function Home() {
           ))}
         </section>
 
+
+        <section className="min-h-screen flex flex-col justify-center items-center py-20 px-6 relative">
+  {/* Background pulse effect */}
+  <motion.div 
+    className="absolute inset-0 bg-gradient-radial from-purple-500/10 to-transparent"
+    animate={{
+      scale: [1, 1.2, 1],
+      opacity: [0.1, 0.3, 0.1]
+    }}
+    transition={{
+      duration: 6,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }}
+  />
+  
+  <motion.div
+    className="flex flex-col md:flex-row items-center justify-center gap-12 max-w-6xl mx-auto"
+    initial={{ opacity: 0, y: 50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+  >
+    <div className="w-full md:w-1/2">
+      <h2 className="text-4xl md:text-6xl font-bold text-purple-500 mb-6">
+        Accept Crypto Payments
+      </h2>
+      <p className="text-lg md:text-xl text-gray-300 mb-8">
+        We support cryptocurrency payments for faster, more secure transactions with lower fees.
+        Get paid instantly without waiting for bank transfers.
+      </p>
+      <ul className="space-y-4 text-gray-400">
+        <li className="flex items-center">
+          <FaStar className="text-yellow-400 mr-3" /> Instant settlements
+        </li>
+        <li className="flex items-center">
+          <FaStar className="text-yellow-400 mr-3" /> Lower transaction fees
+        </li>
+        <li className="flex items-center">
+          <FaStar className="text-yellow-400 mr-3" /> Global payments
+        </li>
+      </ul>
+    </div>
+    
+    <div className="w-full md:w-1/2 flex justify-center">
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="relative"
+      >
+        <img 
+          src={crpyto} 
+          alt="Crypto Payments" 
+          className="max-w-full h-auto rounded-lg shadow-2xl border-2 border-purple-500/50"
+        />
+        <motion.div
+          className="absolute -inset-4 border-2 border-purple-400/30 rounded-lg pointer-events-none"
+          animate={{
+            scale: [1, 1.05, 1],
+            opacity: [0.5, 0.8, 0.5]
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      </motion.div>
+    </div>
+  </motion.div>
+</section>
         {/* Ticket Graphic Section */}
         <section id="contact" className="py-24 px-6 bg-gradient-to-b from-gray-900 to-black text-center flex flex-col items-center relative">
           {/* Animated ticket graphics */}
