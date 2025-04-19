@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import './App.css';
 import logo from './img/logo.png';
-import image1 from './img/stage.png';
+import image1 from './img/image1.jpg';
 import image2 from './img/image2.jpg';
 import image3 from './img/image3.jpg';
+import stage from "./img/stage.png";
 import { FaBars, FaTicketAlt, FaMusic, FaCalendarAlt, FaStar } from 'react-icons/fa';
 import { GiTicket, GiMicrophone, GiTheaterCurtains } from 'react-icons/gi';
 
@@ -72,10 +73,12 @@ const Sparkle = ({ scrollYProgress }) => {
 };
 
 export default function Home() {
-  const images = [image1, image2, image3, image4, image5];
+  const images = [stage, image2, image3, image4, image5]; // stage image is first
   const [ticketCount, setTicketCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [showGraphics, setShowGraphics] = useState(false);
   const { scrollYProgress } = useScroll();
 
@@ -91,25 +94,39 @@ export default function Home() {
     }, 30);
 
     const handleScroll = () => {
-      if (window.scrollY > 10) {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > 10) {
         setScrolled(true);
       } else {
         setScrolled(false);
       }
-      if (window.scrollY > 200) {
+      
+      if (currentScrollY > 200) {
         setShowGraphics(true);
       } else {
         setShowGraphics(false);
       }
+      
+      // Hide nav when scrolling down, show when scrolling up
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down
+        setNavHidden(true);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setNavHidden(false);
+      }
+      
+      setLastScrollY(currentScrollY);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     
     return () => {
       clearInterval(interval);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [lastScrollY]);
 
   return (
     <main className="bg-black text-white min-h-screen flex flex-col font-sans overflow-hidden">
@@ -143,8 +160,13 @@ export default function Home() {
         />
       </div>
 
-      {/* Navigation Bar */}
-      <nav className={`fixed w-full bg-black/90 backdrop-blur-sm text-white py-5 px-8 flex justify-between items-center z-50 transition-all duration-300 ${scrolled ? 'shadow-xl' : ''}`}>
+      {/* Navigation Bar - Will hide on scroll down */}
+      <motion.nav 
+        className={`fixed w-full bg-black/90 backdrop-blur-sm text-white py-5 px-8 flex justify-between items-center z-50 transition-all duration-300 ${scrolled ? 'shadow-xl' : ''}`}
+        initial={{ y: 0 }}
+        animate={{ y: navHidden ? -100 : 0 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
         <motion.div 
           className="flex items-center"
           initial={{ opacity: 0 }}
@@ -176,7 +198,7 @@ export default function Home() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          {['Home', 'Events', 'Sell Tickets', 'Rentals', 'Contact', 'Login'].map((item) => (
+          {['Home', 'Features', 'Contact'].map((item) => (
             <motion.li 
               key={item}
               className="w-full md:w-auto"
@@ -184,7 +206,7 @@ export default function Home() {
               transition={{ type: 'spring', stiffness: 300 }}
             >
               <a 
-                href={`#${item.toLowerCase().replace(' ', '-')}`} 
+                href={`#${item.toLowerCase()}`} 
                 className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-300 block py-2 w-full"
               >
                 {item.toUpperCase()}
@@ -192,7 +214,7 @@ export default function Home() {
             </motion.li>
           ))}
         </motion.ul>
-      </nav>
+      </motion.nav>
 
       {/* Main Content */}
       <div className="flex-grow pt-32 md:pt-40 relative z-10">
@@ -249,7 +271,7 @@ export default function Home() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light text-white tracking-tight leading-tight"
           >
-            <span className="font-medium text-red-500">Tickets</span>ToMyShow
+            <span className="font-medium text-red-500">TicketsToMyShow</span>.com
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 50 }}
@@ -257,12 +279,12 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="text-lg sm:text-xl md:text-2xl mt-8 text-gray-300 font-light tracking-wider max-w-2xl"
           >
-            Where every seat tells a story. Experience events reimagined.
+            Where Every Seat Has a Story.
           </motion.p>
         </section>
 
-        {/* Events Section */}
-        <section id="events" className="min-h-screen bg-gradient-to-b from-black to-gray-900/80 py-28 px-6 flex flex-col items-center relative">
+        {/* Features Section */}
+        <section id="features" className="h-[120vh] bg-gradient-to-b from-black to-gray-900/80 py-28 px-6 flex flex-col items-center relative">
           {/* Floating event icons */}
           <AnimatePresence>
             {showGraphics && (
@@ -306,52 +328,80 @@ export default function Home() {
             )}
           </AnimatePresence>
 
-          <motion.div 
-            className="text-center"
+          <motion.h2
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="text-4xl md:text-6xl font-extrabold mb-6"
           >
-            <h2 className="text-4xl md:text-6xl font-light mb-6 tracking-tight">
-              <span className="font-medium">Discover</span> Events
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-300 font-light max-w-3xl leading-relaxed">
-              Curated selection of concerts, festivals, and exclusive experiences
+            Wanna Sell Tickets for Your Own Event?
+          </motion.h2>
+          <motion.p
+            className="text-lg md:text-2xl max-w-3xl text-center text-gray-400"
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 1 }}
+          >
+            Our easy-to-use platform lets you customize seating charts for warehouse events, stadiums, and outdoor spaces. Accept crypto, get fast payouts, and design your show your way!
+          </motion.p>
+          <motion.div
+            className="mt-12 text-2xl md:text-4xl text-yellow-400"
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+          >
+            <p className="uppercase font-black animate-pulse">
+              Customize • Create • Control • Crypto • Concerts
             </p>
-          </motion.div>
-
-          <motion.div 
-            className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            {['Concerts', 'Festivals', 'Theater'].map((category, index) => (
-              <motion.div 
-                key={category}
-                className="bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-yellow-400 transition-all duration-300"
-                whileHover={{ y: -10 }}
-              >
-                <div className="h-64 overflow-hidden">
-                  <img 
-                    src={images[index]} 
-                    alt={category} 
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-medium mb-2">{category}</h3>
-                  <p className="text-gray-400 font-light">Explore upcoming {category.toLowerCase()} events</p>
-                </div>
-              </motion.div>
-            ))}
           </motion.div>
         </section>
 
-        {/* Sell Tickets Section */}
-        <section id="sell-tickets" className="min-h-screen py-28 px-6 bg-black flex flex-col items-center relative">
+        {/* Feature Cards */}
+        <section className="py-24 px-6 bg-black flex flex-col gap-20">
+          {[
+            {
+              title: "Interactive Seating Charts",
+              description: "Customize interactive seating charts for maximum control.",
+              image: stage // Using the stage image for first feature
+            },
+            {
+              title: "Flexible Payments",
+              description: "Accept crypto & traditional payments with fast payout.",
+              image: image2
+            },
+            {
+              title: "Powerful Dashboard",
+              description: "Manage events, prices, and sales with our dashboard.",
+              image: image3
+            }
+          ].map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 100 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: index * 0.3 }}
+              className="flex flex-col md:flex-row items-center justify-center gap-8"
+            >
+              <div className="w-full md:w-1/2">
+                <h3 className="text-3xl md:text-5xl font-bold text-red-500 mb-4">
+                  {item.title}
+                </h3>
+                <p className="text-gray-300 text-lg md:text-2xl">
+                  {item.description}
+                </p>
+              </div>
+              <div className="w-full md:w-1/2 bg-gray-800 rounded-xl h-[300px] md:h-[400px] shadow-lg overflow-hidden">
+                <img 
+                  src={item.image} 
+                  alt={item.title} 
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
+                />
+              </div>
+            </motion.div>
+          ))}
+        </section>
+
+        {/* Ticket Graphic Section */}
+        <section id="contact" className="py-24 px-6 bg-gradient-to-b from-gray-900 to-black text-center flex flex-col items-center relative">
           {/* Animated ticket graphics */}
           <AnimatePresence>
             {showGraphics && (
@@ -392,74 +442,41 @@ export default function Home() {
             )}
           </AnimatePresence>
 
-          <motion.div
-            className="text-center mb-20"
+          <motion.h2
+            className="text-4xl md:text-6xl font-extrabold text-yellow-400 mb-10"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            transition={{ duration: 1 }}
           >
-            <h2 className="text-4xl md:text-6xl font-light mb-6 tracking-tight">
-              <span className="font-medium">Sell Tickets</span> Effortlessly
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-300 font-light max-w-3xl leading-relaxed">
-              Our platform makes event management simple and efficient
-            </p>
+            Ticket Preview & Client Count
+          </motion.h2>
+
+          <motion.div
+            className="bg-white text-black p-8 rounded-2xl shadow-2xl max-w-md w-full relative border-4 border-yellow-400"
+            initial={{ scale: 0.8, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1 }}
+          >
+            <div className="bg-yellow-400 px-4 py-2 rounded-full text-sm font-bold text-black absolute -top-6 left-1/2 transform -translate-x-1/2">
+              Official Ticket
+            </div>
+            <h3 className="text-2xl font-bold mb-2 mt-6">Event: Warehouse Vibes</h3>
+            <p className="mb-4 text-gray-600">Admit One - Row A, Seat 12</p>
+            <img src={qrCode} alt="QR Code" className="mx-auto border-2 border-black rounded-lg" />
+            <p className="text-center text-xs text-gray-400 mt-4">Scan this ticket at the gate</p>
           </motion.div>
 
-          <div className="max-w-5xl mx-auto w-full">
-            {[
-              {
-                title: "Event Setup",
-                description: "Create and manage events with our intuitive dashboard",
-                feature: "Drag-and-drop interface"
-              },
-              {
-                title: "Ticketing Options",
-                description: "Flexible pricing and ticket types for any event",
-                feature: "Dynamic pricing controls"
-              },
-              {
-                title: "Real Analytics",
-                description: "Track sales and audience data in real-time",
-                feature: "Comprehensive reporting"
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                className="flex flex-col md:flex-row items-center mb-20 last:mb-0"
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:pr-10' : 'md:pl-10'} order-1 md:order-${index % 2 === 0 ? 1 : 2}`}>
-                  <h3 className="text-3xl md:text-4xl font-light mb-4">
-                    <span className="font-medium">{item.title}</span>
-                  </h3>
-                  <p className="text-xl text-gray-300 font-light mb-4 leading-relaxed">
-                    {item.description}
-                  </p>
-                  <p className="text-yellow-400 font-medium">
-                    {item.feature}
-                  </p>
-                </div>
-                <div className={`w-full md:w-1/2 mt-8 md:mt-0 order-2 md:order-${index % 2 === 0 ? 2 : 1}`}>
-                  <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl overflow-hidden h-64 md:h-80 border border-gray-700">
-                    <img 
-                      src={images[index]} 
-                      alt={item.title} 
-                      className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300" 
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <motion.div
+            className="mt-12 text-4xl text-green-400 font-black animate-pulse"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+          >
+            Tickets Generated: {ticketCount.toLocaleString()}
+          </motion.div>
         </section>
 
-        {/* Rentals Section */}
-        <section id="rentals" className="py-24 px-6 bg-gradient-to-b from-gray-900 to-black text-center flex flex-col items-center relative">
+        {/* Contact Section */}
+        <section className="bg-gray-900 py-32 text-center px-6">
           {/* Pulsing venue graphics */}
           <AnimatePresence>
             {showGraphics && (
@@ -503,64 +520,32 @@ export default function Home() {
           </AnimatePresence>
 
           <motion.h2
-            className="text-5xl md:text-7xl font-black text-yellow-400 mb-12 tracking-tight"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            className="text-5xl md:text-7xl font-extrabold text-yellow-500 mb-12"
+            initial={{ scale: 0 }}
+            whileInView={{ scale: 1 }}
             transition={{ duration: 1 }}
           >
-            VENUE RENTALS MADE SIMPLE
+            Let's Build Your Vision
           </motion.h2>
           <motion.div
-            className="bg-white text-black p-8 rounded-2xl shadow-2xl max-w-md w-full relative border-4 border-yellow-400"
-            initial={{ scale: 0.8, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1 }}
-          >
-            <div className="bg-yellow-400 px-4 py-2 rounded-full text-sm font-black text-black absolute -top-6 left-1/2 transform -translate-x-1/2 tracking-wide">
-              FEATURED VENUE
-            </div>
-            <h3 className="text-3xl font-black mb-4 mt-6 tracking-tight">DOWNTOWN EVENT SPACE</h3>
-            <p className="mb-6 text-gray-600 font-medium">CAPACITY: 500 PEOPLE</p>
-            <img src={qrCode} alt="QR Code" className="mx-auto border-2 border-black rounded-lg" />
-            <p className="text-center text-sm font-bold text-gray-400 mt-6 tracking-wide">SCAN TO VIEW MORE DETAILS</p>
-          </motion.div>
-
-          <motion.p
-            className="mt-16 text-2xl md:text-3xl text-gray-300 max-w-4xl font-medium leading-relaxed"
+            className="max-w-4xl mx-auto text-gray-300 text-lg md:text-2xl"
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 1 }}
           >
-            FIND AND BOOK THE PERFECT VENUE FOR YOUR NEXT EVENT FROM OUR EXTENSIVE NETWORK OF PARTNERS.
-          </motion.p>
+            Need help launching your next outdoor festival or warehouse rave? We've got the tech, team, and tools to make it happen. Contact us today.
+          </motion.div>
         </section>
       </div>
 
       {/* Footer */}
-      <footer className="bg-black border-t border-gray-800 py-16 px-6 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-12">
-            <img src={logo} alt="Logo" className="h-24 w-auto mb-6 md:mb-0" />
-            <div className="flex space-x-8">
-              {['About', 'Careers', 'Blog', 'Press'].map((item) => (
-                <a key={item} href="#" className="text-gray-400 hover:text-white transition-colors duration-300 font-light">
-                  {item}
-                </a>
-              ))}
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-12 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-500 font-light mb-4 md:mb-0">
-              © {new Date().getFullYear()} TicketsToMyShow. All rights reserved.
-            </p>
-            <div className="flex space-x-6">
-              {['Terms', 'Privacy', 'Cookies'].map((item) => (
-                <a key={item} href="#" className="text-gray-500 hover:text-white transition-colors duration-300 font-light">
-                  {item}
-                </a>
-              ))}
-            </div>
-          </div>
+      <footer className="bg-black text-gray-400 py-10 px-6 text-center border-t border-gray-800">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-lg font-bold mb-2">TicketsToMyShow.com</p>
+          <p className="text-sm">Empowering creators, producers, and dreamers to deliver the best event experiences.</p>
+          <p className="text-sm mt-4">Email: support@ticketstomyshow.com | Phone: (800) 123-4567</p>
+          <p className="text-sm mt-2">123 Event Way, Los Angeles, CA 90001</p>
+          <p className="text-xs mt-6">© {new Date().getFullYear()} TicketsToMyShow.com — All rights reserved</p>
         </div>
       </footer>
     </main>
