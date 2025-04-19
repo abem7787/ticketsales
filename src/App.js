@@ -274,7 +274,7 @@ export default function Home() {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light text-white tracking-tight leading-tight"
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light text-white tracking-tight leading-tightnpm"
           >
             <span className="font-medium text-red-500">TicketsToMyShow</span>.com
           </motion.h1>
