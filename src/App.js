@@ -162,10 +162,12 @@ export default function Home() {
 
       {/* Navigation Bar - Will hide on scroll down */}
       <motion.nav 
-        className={`fixed w-full bg-black/90 backdrop-blur-sm text-white py-5 px-8 flex justify-between items-center z-50 transition-all duration-300 ${scrolled ? 'shadow-xl' : ''}`}
+        className={`fixed w-full bg-black/90 backdrop-blur-sm text-white py-5 px-8 flex justify-between items-center z-50 transition-all duration-300 ${navHidden ? 'hidden' : 'block'}`}
         initial={{ y: 0 }}
         animate={{ y: navHidden ? -100 : 0 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
+        onAnimationStart={() => console.log('Animation Started')}
+        onUpdate={(latest) => console.log('Latest Animation:', latest)}
       >
         <motion.div 
           className="flex items-center"
