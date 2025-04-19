@@ -178,7 +178,7 @@ export default function Home() {
           <img 
             src={logo} 
             alt="Logo" 
-            className="h-40 md:h-60 w-auto mr-6 transition-all duration-300"
+            className="h-70 md:h-80 w-auto mr-6 transition-all duration-300"
           />
         </motion.div>
 
@@ -200,7 +200,7 @@ export default function Home() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          {['Home', 'Features', 'Contact'].map((item) => (
+          {["Home" , "Events", "sell tickets", "contact us" , "Rentals" , "Login"].map((item) => (
             <motion.li 
               key={item}
               className="w-full md:w-auto"
