@@ -84,7 +84,6 @@ export default function Home() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showGraphics, setShowGraphics] = useState(false);
   const { scrollYProgress } = useScroll();
-
   useEffect(() => {
     let counter = 0;
     const interval = setInterval(() => {
@@ -95,8 +94,13 @@ export default function Home() {
       }
       setTicketCount(counter);
     }, 30);
-
+  
+    let scrollTimeout;
+    
     const handleScroll = () => {
+      // Clear any existing timeout
+      clearTimeout(scrollTimeout);
+      
       const currentScrollY = window.scrollY;
       
       if (currentScrollY > 10) {
@@ -115,18 +119,26 @@ export default function Home() {
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         // Scrolling down
         setNavHidden(true);
+        setMenuOpen(false);
       } else if (currentScrollY < lastScrollY) {
         // Scrolling up
         setNavHidden(false);
       }
       
+      // Set a timeout to return to original state after scrolling stops
+      scrollTimeout = setTimeout(() => {
+        setNavHidden(false);
+        setMenuOpen(false);
+      }, 500); // Adjust this timeout as needed
+      
       setLastScrollY(currentScrollY);
     };
-
+  
     window.addEventListener('scroll', handleScroll, { passive: true });
     
     return () => {
       clearInterval(interval);
+      clearTimeout(scrollTimeout);
       window.removeEventListener('scroll', handleScroll);
     };
   }, [lastScrollY]);
