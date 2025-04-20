@@ -3,18 +3,21 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import './App.css';
 import logo from './img/logo.png';
 import image1 from './img/image1.jpg';
-import crpyto from "./img/crypto.png"
+import crpyto from "./img/crypto.png";
 import image2 from './img/image2.jpg';
 import image3 from './img/image3.jpg';
 import stage from "./img/stage.png";
 import { FaBars, FaTicketAlt, FaMusic, FaCalendarAlt, FaStar } from 'react-icons/fa';
 import { GiTicket, GiMicrophone, GiTheaterCurtains } from 'react-icons/gi';
 
+// Add your video import (replace with your actual video file)
+// import backgroundVideo from "../src/img/";
+
 const image4 = 'https://via.placeholder.com/600x400?text=Image+4';
 const image5 = 'https://via.placeholder.com/600x400?text=Image+5';
 const qrCode = 'https://api.qrserver.com/v1/create-qr-code/?data=Ticket123456&size=150x150';
 
-// Floating graphic components
+// Floating graphic components with slower animations
 const FloatingTicket = ({ scrollYProgress }) => {
   const x = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const y = useTransform(scrollYProgress, [0, 1], [0, -150]);
@@ -23,60 +26,124 @@ const FloatingTicket = ({ scrollYProgress }) => {
   return (
     <motion.div 
       className="absolute text-yellow-400 text-6xl opacity-70"
-      style={{ x, y, rotate, left: '10%', top: '20%' }}
+      style={{ 
+        x, 
+        y, 
+        rotate, 
+        left: '10%', 
+        top: '20%',
+        transition: 'all 2s ease-out' // Slower movement
+      }}
     >
       <FaTicketAlt />
-      
     </motion.div>
   );
 };
 
 const BouncingMusicNote = ({ scrollYProgress }) => {
-  const y = useTransform(scrollYProgress, [0, 0.5, 1], [0, -100, 50]);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.5, 1]);
+  const y = useTransform(scrollYProgress, [0, 0.5, 1], [0, -100, 50], {
+    duration: 3 // Slower bounce
+  });
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.5, 1], {
+    duration: 3 // Slower scale
+  });
   
   return (
     <motion.div 
       className="absolute text-red-500 text-5xl"
-      style={{ y, scale, right: '15%', top: '40%' }}
+      style={{ 
+        y, 
+        scale, 
+        right: '15%', 
+        top: '40%',
+        transition: 'all 3s ease-in-out' // Slower transition
+      }}
     >
       <FaMusic />
-      
     </motion.div>
   );
 };
 
 const RotatingStage = ({ scrollYProgress }) => {
-  const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
-  const scale = useTransform(scrollYProgress, [0, 0.3, 0.6, 1], [0.5, 1.2, 0.8, 1]);
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, 360], {
+    duration: 10 // Much slower rotation
+  });
+  const scale = useTransform(scrollYProgress, [0, 0.3, 0.6, 1], [0.5, 1.2, 0.8, 1], {
+    duration: 5 // Slower scale
+  });
   
   return (
     <motion.div 
       className="absolute text-white text-7xl opacity-60"
-      style={{ rotate, scale, left: '30%', bottom: '10%' }}
+      style={{ 
+        rotate, 
+        scale, 
+        left: '30%', 
+        bottom: '10%',
+        transition: 'all 5s ease-in-out' // Slower transition
+      }}
     >
       <GiMicrophone />
     </motion.div>
   );
 };
 
+// Slower Sparkle animation
 const Sparkle = ({ scrollYProgress }) => {
-  const x = useTransform(scrollYProgress, [0, 1], [0, Math.random() * 200 - 100]);
-  const y = useTransform(scrollYProgress, [0, 1], [0, Math.random() * 200 - 100]);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 0]);
+  const x = useTransform(scrollYProgress, [0, 1], [0, Math.random() * 200 - 100], {
+    duration: 10 + Math.random() * 10 // Much slower movement
+  });
+  const y = useTransform(scrollYProgress, [0, 1], [0, Math.random() * 200 - 100], {
+    duration: 10 + Math.random() * 10 // Much slower movement
+  });
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 0], {
+    duration: 5 + Math.random() * 5 // Slower scale
+  });
   
   return (
     <motion.div 
       className="absolute text-yellow-300"
-      style={{ x, y, scale, left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }}
+      style={{ 
+        x, 
+        y, 
+        scale, 
+        left: `${Math.random() * 100}%`, 
+        top: `${Math.random() * 100}%`,
+        transition: 'all 5s ease-in-out' // Slower transition
+      }}
     >
       <FaStar />
     </motion.div>
   );
 };
 
+// Enhanced BulkyTextReveal with slower animation and video background
+const BulkyTextReveal = ({ text, index }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 100, scale: 0.8 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: false, margin: "-100px" }}
+      transition={{ 
+        duration: 1.5, // Slower duration
+        delay: index * 0.5, // Increased delay between words
+        ease: [0.16, 1, 0.3, 1]
+      }}
+      className="text-7xl md:text-9xl font-black tracking-tight leading-none relative z-10"
+      style={{
+        WebkitTextStroke: '2px white',
+        color: 'transparent',
+        textShadow: '0 0 20px rgba(255,255,255,0.5)',
+        mixBlendMode: 'overlay'
+      }}
+    >
+      {text}
+    </motion.div>
+  );
+};
+
 export default function Home() {
-  const images = [stage, image2, image3, image4, image5]; // stage image is first
+  const images = [stage, image2, image3, image4, image5];
   const [ticketCount, setTicketCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -85,8 +152,14 @@ export default function Home() {
   const [showGraphics, setShowGraphics] = useState(false);
   const { scrollYProgress } = useScroll();
   
-  
-  
+  const bulkyTexts = [
+    "EXPERIENCE",
+    "THE",
+    "ULTIMATE",
+    "EVENT",
+    "PLATFORM"
+  ];
+
   useEffect(() => {
     let counter = 0;
     const interval = setInterval(() => {
@@ -113,13 +186,10 @@ export default function Home() {
         setShowGraphics(false);
       }
       
-      // Hide nav when scrolling down, only show when at top of page
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down - hide nav
         setNavHidden(true);
         setMenuOpen(false);
       } else if (currentScrollY === 0) {
-        // At top of page - show nav
         setNavHidden(false);
       }
       
@@ -136,7 +206,7 @@ export default function Home() {
 
   return (
     <main className="bg-black text-white min-h-screen flex flex-col font-sans overflow-hidden">
-      {/* Animated background elements */}
+      {/* Animated background elements with slower animations */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <AnimatePresence>
           {showGraphics && (
@@ -151,7 +221,7 @@ export default function Home() {
           )}
         </AnimatePresence>
         
-        {/* Pulse effect */}
+        {/* Pulse effect with slower animation */}
         <motion.div 
           className="absolute inset-0 bg-gradient-radial from-yellow-400/10 to-transparent"
           animate={{
@@ -159,32 +229,30 @@ export default function Home() {
             opacity: [0.1, 0.3, 0.1]
           }}
           transition={{
-            duration: 8,
+            duration: 15, // Much slower pulse
             repeat: Infinity,
             ease: "easeInOut"
           }}
         />
       </div>
 
-      {/* Navigation Bar - Will hide on scroll down */}
+      {/* Navigation Bar with slower animation */}
       <motion.nav 
         className={`fixed w-full bg-black/90 backdrop-blur-sm text-white py-5 px-8 flex justify-between items-center z-50 transition-all duration-300 ${navHidden ? 'hidden' : 'block'}`}
         initial={{ y: 0 }}
         animate={{ y: navHidden ? -100 : 0 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        onAnimationStart={() => console.log('Animation Started')}
-        onUpdate={(latest) => console.log('Latest Animation:', latest)}
+        transition={{ duration: 0.5, ease: "easeInOut" }} // Slower nav transition
       >
         <motion.div 
           className="flex items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 1 }} // Slower fade in
         >
           <img 
             src={logo} 
             alt="Logo" 
-            className="h-70 md:h-80 w-auto mr-6 transition-all duration-300"
+            className="h-70 md:h-80 w-auto mr-6 transition-all duration-500" // Slower transition
           />
         </motion.div>
 
@@ -193,7 +261,7 @@ export default function Home() {
             onClick={() => setMenuOpen(!menuOpen)}
             className="text-white focus:outline-none p-2 flex items-center space-x-2"
             aria-label="Menu"
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, transition: { duration: 0.5 } }} // Slower hover
           >
             <span className="text-base font-medium tracking-wider">MENU</span>
             <FaBars size={20} className="text-gray-300" />
@@ -204,18 +272,21 @@ export default function Home() {
           className={`${menuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row absolute md:static top-28 left-0 w-full md:w-auto bg-black/95 md:bg-transparent px-8 py-6 md:p-0 space-y-6 md:space-y-0 md:space-x-10`}
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.5 }} // Slower menu reveal
         >
-          {["Home" , "Events", "sell tickets", "contact us" , "Rentals" , "Login"].map((item) => (
+          {["Home", "Events", "sell tickets", "contact us", "Rentals", "Login"].map((item) => (
             <motion.li 
               key={item}
               className="w-full md:w-auto"
-              whileHover={{ y: -2 }}
+              whileHover={{ 
+                y: -2,
+                transition: { type: 'spring', stiffness: 200, damping: 10 } // Slower spring
+              }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
               <a 
                 href={`#${item.toLowerCase()}`} 
-                className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-300 block py-2 w-full"
+                className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-500" // Slower color transition
               >
                 {item.toUpperCase()}
               </a>
@@ -226,9 +297,8 @@ export default function Home() {
 
       {/* Main Content */}
       <div className="flex-grow pt-32 md:pt-40 relative z-10">
-        {/* Hero Section */}
+        {/* Hero Section with slower animations */}
         <section id="home" className="h-screen flex flex-col justify-center items-center text-center px-6 pt-0 relative">
-          {/* Confetti effect on scroll */}
           <AnimatePresence>
             {showGraphics && (
               <motion.div 
@@ -236,12 +306,13 @@ export default function Home() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 2 }} // Slower fade
               >
                 {[...Array(30)].map((_, i) => {
                   const x = Math.random() * 100;
                   const y = Math.random() * 100 - 50;
-                  const delay = Math.random() * 0.5;
-                  const duration = 1 + Math.random() * 2;
+                  const delay = Math.random() * 1; // Longer random delay
+                  const duration = 3 + Math.random() * 4; // Slower animation
                   const icon = [FaTicketAlt, FaMusic, GiTicket, GiTheaterCurtains][Math.floor(Math.random() * 4)];
                   const IconComponent = icon;
                   const colors = ['text-yellow-400', 'text-red-500', 'text-white', 'text-purple-400'];
@@ -274,36 +345,105 @@ export default function Home() {
           </AnimatePresence>
 
           <motion.h1
-  initial={{ opacity: 0, y: -50 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-  className="px-4 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white tracking-tight leading-tight text-center"
->
-  <span className="font-medium text-red-500 whitespace-nowrap">
-    TicketsToMyShow
-  </span>
-  <span className="whitespace-nowrap">.com</span>
-</motion.h1>
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }} // Slower animation
+            className="px-4 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white tracking-tight leading-tight text-center"
+          >
+            <span className="font-medium text-red-500 whitespace-nowrap">
+              TicketsToMyShow
+            </span>
+            <span className="whitespace-nowrap">.com</span>
+          </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 1.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }} // Slower animation
             className="text-lg sm:text-xl md:text-2xl mt-8 text-gray-300 font-light tracking-wider max-w-2xl"
           >
             Where Every Seat Has a Story.
           </motion.p>
         </section>
 
-        {/* Features Section */}
+        {/* Enhanced Bulky Text Reveal Section with Video Background */}
+        <section className="min-h-screen flex flex-col justify-center items-center relative overflow-hidden">
+          {/* Video Background */}
+          <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              className="w-full h-full object-cover opacity-70"
+            >
+              {/* <source src={backgroundVideo} type="video/mp4" /> */}
+              Your browser does not support the video tag.
+            </video>
+            <div className="absolute inset-0 bg-black/50"></div>
+          </div>
+          
+          {/* Bulky Text */}
+          <div className="max-w-4xl mx-auto text-center space-y-4 md:space-y-8 relative z-10">
+            {bulkyTexts.map((text, index) => (
+              <BulkyTextReveal key={index} text={text} index={index} />
+            ))}
+          </div>
+          
+          {/* Animated background elements with slower animations */}
+          <motion.div 
+            className="absolute inset-0 overflow-hidden pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: showGraphics ? 0.6 : 0 }}
+            transition={{ duration: 2 }} // Slower fade in
+          >
+            <motion.div 
+              className="absolute inset-0 bg-gradient-radial from-yellow-400/10 to-transparent"
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.1, 0.3, 0.1]
+              }}
+              transition={{
+                duration: 15, // Much slower pulse
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+            
+            {[...Array(10)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute text-yellow-400 text-4xl"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`
+                }}
+                animate={{
+                  y: [0, -50, 0],
+                  opacity: [0.4, 0.8, 0.4],
+                  rotate: [0, 180, 360]
+                }}
+                transition={{
+                  duration: 10 + Math.random() * 10, // Slower floating
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              >
+                <GiTicket />
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+
+        {/* Features Section with slower animations */}
         <section id="features" className="h-[120vh] bg-gradient-to-b from-black to-gray-900/80 py-28 px-6 flex flex-col items-center relative">
-          {/* Floating event icons */}
+          {/* Floating event icons with slower animations */}
           <AnimatePresence>
             {showGraphics && (
               <motion.div 
                 className="absolute inset-0 overflow-hidden pointer-events-none"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.6 }}
-                transition={{ duration: 1 }}
+                transition={{ duration: 2 }} // Slower fade
               >
                 {['concerts', 'festivals', 'theater'].map((type, i) => {
                   const icons = {
@@ -312,7 +452,7 @@ export default function Home() {
                     theater: <GiTheaterCurtains className="text-purple-400" />
                   };
                   const x = 10 + (i * 30);
-                  const delay = i * 0.2;
+                  const delay = i * 0.5; // Longer delay
                   
                   return (
                     <motion.div
@@ -326,7 +466,7 @@ export default function Home() {
                       }}
                       transition={{ 
                         delay,
-                        duration: 3,
+                        duration: 5, // Slower animation
                         repeat: Infinity,
                         ease: "easeInOut"
                       }}
@@ -342,7 +482,7 @@ export default function Home() {
           <motion.h2
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 1.5 }} // Slower fade
             className="text-4xl md:text-6xl font-extrabold mb-6"
           >
             Wanna Sell Tickets for Your Own Event?
@@ -351,28 +491,19 @@ export default function Home() {
             className="text-lg md:text-2xl max-w-3xl text-center text-gray-400"
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 1.5 }} // Slower animation
           >
             Our easy-to-use platform lets you customize seating charts for warehouse events, stadiums, and outdoor spaces. Accept crypto, get fast payouts, and design your show your way!
           </motion.p>
-          <motion.div
-            className="mt-12 text-2xl md:text-4xl text-yellow-400"
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-          >
-            <p className="uppercase font-black animate-pulse">
-              Customize • Create • Control • Crypto • Concerts
-            </p>
-          </motion.div>
         </section>
 
-        {/* Feature Cards */}
+        {/* Feature Cards with slower animations */}
         <section className="py-24 px-6 bg-black flex flex-col gap-20">
           {[
             {
               title: "Interactive Seating Charts",
               description: "Customize interactive seating charts for maximum control.",
-              image: stage // Using the stage image for first feature
+              image: stage
             },
             {
               title: "Flexible Payments",
@@ -389,7 +520,7 @@ export default function Home() {
               key={index}
               initial={{ opacity: 0, y: 100 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: index * 0.3 }}
+              transition={{ duration: 1.5, delay: index * 0.5 }} // Slower animation with longer delay
               className="flex flex-col md:flex-row items-center justify-center gap-8"
             >
               <div className="w-full md:w-1/2">
@@ -401,101 +532,122 @@ export default function Home() {
                 </p>
               </div>
               <div className="w-full md:w-1/2 bg-gray-800 rounded-xl h-[300px] md:h-[400px] shadow-lg overflow-hidden">
-                <img 
+                <motion.img 
                   src={item.image} 
                   alt={item.title} 
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
+                  className="w-full h-full object-cover"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 1 }} // Slower hover
                 />
               </div>
             </motion.div>
           ))}
         </section>
 
-
+        {/* Crypto Section with slower animations */}
         <section className="min-h-screen flex flex-col justify-center items-center py-20 px-6 relative">
-  {/* Background pulse effect */}
-  <motion.div 
-    className="absolute inset-0 bg-gradient-radial from-purple-500/10 to-transparent"
-    animate={{
-      scale: [1, 1.2, 1],
-      opacity: [0.1, 0.3, 0.1]
-    }}
-    transition={{
-      duration: 6,
-      repeat: Infinity,
-      ease: "easeInOut"
-    }}
-  />
-  
-  <motion.div
-    className="flex flex-col md:flex-row items-center justify-center gap-12 max-w-6xl mx-auto"
-    initial={{ opacity: 0, y: 50 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1 }}
-  >
-    <div className="w-full md:w-1/2">
-      <h2 className="text-4xl md:text-6xl font-bold text-purple-500 mb-6">
-        Accept Crypto Payments
-      </h2>
-      <p className="text-lg md:text-xl text-gray-300 mb-8">
-        We support cryptocurrency payments for faster, more secure transactions with lower fees.
-        Get paid instantly without waiting for bank transfers.
-      </p>
-      <ul className="space-y-4 text-gray-400">
-        <li className="flex items-center">
-          <FaStar className="text-yellow-400 mr-3" /> Instant settlements
-        </li>
-        <li className="flex items-center">
-          <FaStar className="text-yellow-400 mr-3" /> Lower transaction fees
-        </li>
-        <li className="flex items-center">
-          <FaStar className="text-yellow-400 mr-3" /> Global payments
-        </li>
-      </ul>
-    </div>
-    
-    <div className="w-full md:w-1/2 flex justify-center">
-      <motion.div
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="relative"
-      >
-        <img 
-          src={crpyto} 
-          alt="Crypto Payments" 
-          className="max-w-full h-auto rounded-lg shadow-2xl border-2 border-purple-500/50"
-        />
-        <motion.div
-          className="absolute -inset-4 border-2 border-purple-400/30 rounded-lg pointer-events-none"
-          animate={{
-            scale: [1, 1.05, 1],
-            opacity: [0.5, 0.8, 0.5]
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      </motion.div>
-    </div>
-  </motion.div>
-</section>
-        {/* Ticket Graphic Section */}
+          {/* Background pulse effect with slower animation */}
+          <motion.div 
+            className="absolute inset-0 bg-gradient-radial from-purple-500/10 to-transparent"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.1, 0.3, 0.1]
+            }}
+            transition={{
+              duration: 10, // Slower pulse
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          
+          <motion.div
+            className="flex flex-col md:flex-row items-center justify-center gap-12 max-w-6xl mx-auto"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.5 }} // Slower animation
+          >
+            <div className="w-full md:w-1/2">
+              <motion.h2
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 1 }} // Slower fade
+                className="text-4xl md:text-6xl font-bold text-purple-500 mb-6"
+              >
+                Accept Crypto Payments
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 1 }} // Slower fade
+                className="text-lg md:text-xl text-gray-300 mb-8"
+              >
+                We support cryptocurrency payments for faster, more secure transactions with lower fees.
+                Get paid instantly without waiting for bank transfers.
+              </motion.p>
+              <motion.ul 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.9, duration: 1 }} // Slower fade
+                className="space-y-4 text-gray-400"
+              >
+                <li className="flex items-center">
+                  <FaStar className="text-yellow-400 mr-3" /> Instant settlements
+                </li>
+                <li className="flex items-center">
+                  <FaStar className="text-yellow-400 mr-3" /> Lower transaction fees
+                </li>
+                <li className="flex items-center">
+                  <FaStar className="text-yellow-400 mr-3" /> Global payments
+                </li>
+              </motion.ul>
+            </div>
+            
+            <div className="w-full md:w-1/2 flex justify-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1.5 }} // Slower animation
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative"
+              >
+                <img 
+                  src={crpyto} 
+                  alt="Crypto Payments" 
+                  className="max-w-full h-auto rounded-lg shadow-2xl border-2 border-purple-500/50"
+                />
+                <motion.div
+                  className="absolute -inset-4 border-2 border-purple-400/30 rounded-lg pointer-events-none"
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    opacity: [0.5, 0.8, 0.5]
+                  }}
+                  transition={{
+                    duration: 5, // Slower pulse
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+              </motion.div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* Ticket Graphic Section with slower animations */}
         <section id="contact" className="py-24 px-6 bg-gradient-to-b from-gray-900 to-black text-center flex flex-col items-center relative">
-          {/* Animated ticket graphics */}
+          {/* Animated ticket graphics with slower animations */}
           <AnimatePresence>
             {showGraphics && (
               <motion.div 
                 className="absolute inset-0 overflow-hidden pointer-events-none"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 1.5 }} // Slower fade
               >
                 {[...Array(5)].map((_, i) => {
                   const x = Math.random() * 100;
                   const y = Math.random() * 100;
-                  const delay = i * 0.3;
+                  const delay = i * 0.5; // Longer delay
                   const size = 3 + Math.random() * 4;
                   
                   return (
@@ -510,7 +662,7 @@ export default function Home() {
                       }}
                       transition={{ 
                         delay,
-                        duration: 2,
+                        duration: 3, // Slower animation
                         repeat: Infinity,
                         repeatType: "reverse"
                       }}
@@ -524,19 +676,19 @@ export default function Home() {
           </AnimatePresence>
 
           <motion.h2
-            className="text-4xl md:text-6xl font-extrabold text-yellow-400 mb-10"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 1.5 }} // Slower fade
+            className="text-4xl md:text-6xl font-extrabold text-yellow-400 mb-10"
           >
             Ticket Preview & Client Count
           </motion.h2>
 
           <motion.div
-            className="bg-white text-black p-8 rounded-2xl shadow-2xl max-w-md w-full relative border-4 border-yellow-400"
             initial={{ scale: 0.8, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 1.5 }} // Slower animation
+            className="bg-white text-black p-8 rounded-2xl shadow-2xl max-w-md w-full relative border-4 border-yellow-400"
           >
             <div className="bg-yellow-400 px-4 py-2 rounded-full text-sm font-bold text-black absolute -top-6 left-1/2 transform -translate-x-1/2">
               Official Ticket
@@ -548,29 +700,35 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            className="mt-12 text-4xl text-green-400 font-black animate-pulse"
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ repeat: Infinity, duration: 2 }}
+            className="mt-12 text-4xl text-green-400 font-black"
+            animate={{ 
+              scale: [1, 1.05, 1],
+              opacity: [0.8, 1, 0.8]
+            }}
+            transition={{ 
+              repeat: Infinity, 
+              duration: 3 // Slower pulse
+            }}
           >
             Tickets Generated: {ticketCount.toLocaleString()}
           </motion.div>
         </section>
 
-        {/* Contact Section */}
+        {/* Contact Section with slower animations */}
         <section className="bg-gray-900 py-32 text-center px-6">
-          {/* Pulsing venue graphics */}
+          {/* Pulsing venue graphics with slower animations */}
           <AnimatePresence>
             {showGraphics && (
               <motion.div 
                 className="absolute inset-0 overflow-hidden pointer-events-none"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.7 }}
-                transition={{ duration: 1 }}
+                transition={{ duration: 1.5 }} // Slower fade
               >
                 {[...Array(8)].map((_, i) => {
                   const x = Math.random() * 100;
                   const y = Math.random() * 100;
-                  const delay = i * 0.2;
+                  const delay = i * 0.5; // Longer delay
                   const size = 2 + Math.random() * 3;
                   const colors = ['text-red-500', 'text-yellow-400', 'text-white', 'text-purple-400'];
                   const color = colors[Math.floor(Math.random() * colors.length)];
@@ -587,7 +745,7 @@ export default function Home() {
                       }}
                       transition={{ 
                         delay,
-                        duration: 3,
+                        duration: 5, // Slower animation
                         repeat: Infinity,
                         repeatType: "reverse"
                       }}
@@ -601,18 +759,18 @@ export default function Home() {
           </AnimatePresence>
 
           <motion.h2
-            className="text-5xl md:text-7xl font-extrabold text-yellow-500 mb-12"
             initial={{ scale: 0 }}
             whileInView={{ scale: 1 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 1.5 }} // Slower animation
+            className="text-5xl md:text-7xl font-extrabold text-yellow-500 mb-12"
           >
             Let's Build Your Vision
           </motion.h2>
           <motion.div
-            className="max-w-4xl mx-auto text-gray-300 text-lg md:text-2xl"
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 1.5 }} // Slower animation
+            className="max-w-4xl mx-auto text-gray-300 text-lg md:text-2xl"
           >
             Need help launching your next outdoor festival or warehouse rave? We've got the tech, team, and tools to make it happen. Contact us today.
           </motion.div>
