@@ -217,7 +217,7 @@ export default function Home() {
           <img 
             src={logo} 
             alt="Logo" 
-            className="h-16 md:h-20 w-auto mr-6 transition-all duration-700"
+            className="h-35 md:h-20 w-auto mr-6 transition-all duration-700"
           />
         </motion.div>
 
