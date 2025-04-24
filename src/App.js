@@ -217,7 +217,8 @@ export default function Home() {
           <img 
             src={logo} 
             alt="Logo" 
-            className="h-35 md:h-20 w-auto mr-6 transition-all duration-700"
+            className="h-35 sm:h-28 md:h-36 lg:h-40 w-auto mr-6 transition-transform duration-700 hover:scale-105"
+
           />
         </motion.div>
 
