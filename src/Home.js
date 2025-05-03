@@ -17,7 +17,6 @@ const image4 = 'https://via.placeholder.com/600x400?text=Image+4';
 const image5 = 'https://via.placeholder.com/600x400?text=Image+5';
 const qrCode = 'https://api.qrserver.com/v1/create-qr-code/?data=Ticket123456&size=150x150';
 
-// Fully responsive BulkyTextReveal
 const BulkyTextReveal = ({ text, index }) => {
   return (
     <motion.div
@@ -177,7 +176,7 @@ export default function Home() {
 
       <div className="flex-grow pt-32 md:pt-40 relative z-10">
         {/* Hero Section */}
-        <section id="home" className="h-screen flex flex-col justify-center items-center text-center px-6 pt-0 relative">
+        <section id="home" className="h-screen flex flex-col justify-center items-center text-center px-6 pt-0 mb-0 relative">
           <motion.h1
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -200,7 +199,7 @@ export default function Home() {
         </section>
 
         {/* Bulky Text Section */}
-        <section className="min-h-screen flex flex-col justify-center items-center relative overflow-hidden py-12 md:py-20">
+        <section className="min-h-screen flex flex-col justify-center items-center relative overflow-hidden py-4 md:py-8 mt-0">
           <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
             <video
               autoPlay
@@ -222,7 +221,7 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="h-[120vh] bg-gradient-to-b from-black to-gray-900/80 py-28 px-6 flex flex-col items-center relative">
+        <section id="features" className="h-[100vh] bg-gradient-to-b from-black to-gray-900/80 py-12 px-6 flex flex-col items-center relative mt-0">
           <motion.h2
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -240,9 +239,9 @@ export default function Home() {
             Our easy-to-use platform lets you customize seating charts for warehouse events, stadiums, and outdoor spaces. Accept crypto, get fast payouts, and design your show your way!
           </motion.p>
         </section>
- 
 
-        <section className="py-24 px-6 bg-black text-white text-center">
+        {/* Sell Tickets Section */}
+        <section className="py-12 px-6 bg-black text-white text-center mt-0">
           <motion.h2
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -286,6 +285,156 @@ export default function Home() {
           </motion.div>
         </section>
 
+        {/* Centered Cards Section */}
+        <section className="py-16 px-6 bg-black">
+          <motion.h2 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className="text-4xl md:text-5xl font-bold text-center mb-12 text-white"
+          >
+            Featured Events & Services
+          </motion.h2>
+
+          <div className="flex justify-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl">
+              {/* Festival Card */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="bg-gradient-to-br from-purple-900/80 to-blue-900/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50 w-full max-w-md mx-auto"
+              >
+                <div className="relative h-48 bg-purple-950/50">
+                  <img 
+                    src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                    alt="Music Festival"
+                    className="w-full h-full object-cover opacity-70"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <FaMusic className="text-white text-6xl opacity-50" />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-white mb-2">Electric Dreams Festival</h3>
+                  <p className="text-gray-300 mb-4">June 15-17, 2023</p>
+                  <p className="text-gray-300 mb-6">Downtown Arena</p>
+                  <p className="text-gray-200 mb-6">
+                    The biggest electronic music festival of the year featuring top DJs from around the world. 
+                    Three days of non-stop music, art installations, and unforgettable experiences.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm">Starting at</p>
+                      <p className="text-white font-bold text-xl">0.05 ETH</p>
+                    </div>
+                    <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-full font-medium transition-colors">
+                      Get Tickets
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* How to Purchase Card */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.3 }}
+                className="bg-gradient-to-br from-green-900/80 to-emerald-900/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50 w-full max-w-md mx-auto"
+              >
+                <div className="relative h-48 bg-emerald-950/50">
+                  <img 
+                    src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" 
+                    alt="Crypto Purchase"
+                    className="w-full h-full object-cover opacity-70"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <GiTicket className="text-white text-6xl opacity-50" />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-white mb-6">How to Purchase:</h3>
+                  <ol className="space-y-4 text-gray-200 mb-8">
+                    <li className="flex items-start">
+                      <span className="bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">1</span>
+                      Connect your crypto wallet
+                    </li>
+                    <li className="flex items-start">
+                      <span className="bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">2</span>
+                      Select your tickets and quantity
+                    </li>
+                    <li className="flex items-start">
+                      <span className="bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">3</span>
+                      Choose your preferred cryptocurrency
+                    </li>
+                    <li className="flex items-start">
+                      <span className="bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">4</span>
+                      Confirm the transaction in your wallet
+                    </li>
+                    <li className="flex items-start">
+                      <span className="bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">5</span>
+                      Receive your NFT ticket instantly
+                    </li>
+                  </ol>
+                  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-full font-bold transition-colors flex items-center justify-center">
+                    <span className="mr-2">Connect Wallet</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              </motion.div>
+
+              {/* Service Rental Card */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.4 }}
+                className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50 w-full max-w-md mx-auto"
+              >
+                <div className="relative h-48 bg-gray-950/50">
+                  <img 
+                    src="https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                    alt="Event Production"
+                    className="w-full h-full object-cover opacity-70"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <GiTheaterCurtains className="text-white text-6xl opacity-50" />
+                  </div>
+                </div>
+                <div className="p-6 h-full flex flex-col">
+                  <h3 className="text-2xl font-bold text-white mb-4">Elevate Your Event</h3>
+                  <p className="text-gray-300 mb-8">
+                    Premium stage, sound, and lighting rentals for concerts, corporate 
+                    events, and special occasions.
+                  </p>
+                  
+                  <div className="mt-auto space-y-6">
+                    <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-full font-bold transition-colors">
+                      Get a Quote
+                    </button>
+                    
+                    <div className="border-t border-gray-700 pt-6">
+                      <h4 className="text-lg font-semibold text-white mb-4">Our Services</h4>
+                      <ul className="space-y-3 text-gray-300">
+                        <li className="flex items-center">
+                          <GiMicrophone className="mr-3 text-yellow-400" /> Professional Audio
+                        </li>
+                        <li className="flex items-center">
+                          <GiTheaterCurtains className="mr-3 text-yellow-400" /> Stage Design
+                        </li>
+                        <li className="flex items-center">
+                          <FaStar className="mr-3 text-yellow-400" /> Lighting Solutions
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
         {/* Feature Cards */}
         <section className="py-24 px-6 bg-black flex flex-col gap-20">
           {[
@@ -294,7 +443,6 @@ export default function Home() {
               description: "Customize interactive seating charts for maximum control.",
               image: stage
             },
-            // Inserted Crypto Section Here ↓↓↓
             "crypto",
             {
               title: "Powerful Dashboard",
@@ -466,152 +614,6 @@ export default function Home() {
             Need help launching your next outdoor festival or warehouse rave? We've got the tech, team, and tools to make it happen. Contact us today.
           </motion.div>
         </section>
-        <section className="py-20 px-6 bg-black">
-  <motion.h2 
-    initial={{ opacity: 0, y: 50 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1 }}
-    className="text-4xl md:text-5xl font-bold text-center mb-16 text-white"
-  >
-    Featured Events & Services
-  </motion.h2>
-
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-    {/* Festival Card */}
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1, delay: 0.2 }}
-      className="bg-gradient-to-br from-purple-900/80 to-blue-900/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50"
-    >
-      <div className="relative h-48 bg-purple-950/50">
-        <img 
-          src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-          alt="Music Festival"
-          className="w-full h-full object-cover opacity-70"
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <FaMusic className="text-white text-6xl opacity-50" />
-        </div>
-      </div>
-      <div className="p-6">
-        <h3 className="text-2xl font-bold text-white mb-2">Electric Dreams Festival</h3>
-        <p className="text-gray-300 mb-4">June 15-17, 2023</p>
-        <p className="text-gray-300 mb-6">Downtown Arena</p>
-        <p className="text-gray-200 mb-6">
-          The biggest electronic music festival of the year featuring top DJs from around the world. 
-          Three days of non-stop music, art installations, and unforgettable experiences.
-        </p>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-gray-400 text-sm">Starting at</p>
-            <p className="text-white font-bold text-xl">0.05 ETH</p>
-          </div>
-          <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-full font-medium transition-colors">
-            Get Tickets
-          </button>
-        </div>
-      </div>
-    </motion.div>
-
-    {/* How to Purchase Card */}
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1, delay: 0.3 }}
-      className="bg-gradient-to-br from-green-900/80 to-emerald-900/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50"
-    >
-      <div className="relative h-48 bg-emerald-950/50">
-        <img 
-          src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" 
-          alt="Crypto Purchase"
-          className="w-full h-full object-cover opacity-70"
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <GiTicket className="text-white text-6xl opacity-50" />
-        </div>
-      </div>
-      <div className="p-6">
-        <h3 className="text-2xl font-bold text-white mb-6">How to Purchase:</h3>
-        <ol className="space-y-4 text-gray-200 mb-8">
-          <li className="flex items-start">
-            <span className="bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">1</span>
-            Connect your crypto wallet
-          </li>
-          <li className="flex items-start">
-            <span className="bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">2</span>
-            Select your tickets and quantity
-          </li>
-          <li className="flex items-start">
-            <span className="bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">3</span>
-            Choose your preferred cryptocurrency
-          </li>
-          <li className="flex items-start">
-            <span className="bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">4</span>
-            Confirm the transaction in your wallet
-          </li>
-          <li className="flex items-start">
-            <span className="bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">5</span>
-            Receive your NFT ticket instantly
-          </li>
-        </ol>
-        <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-full font-bold transition-colors flex items-center justify-center">
-          <span className="mr-2">Connect Wallet</span>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
-          </svg>
-        </button>
-      </div>
-    </motion.div>
-
-    {/* Service Rental Card */}
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1, delay: 0.4 }}
-      className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50"
-    >
-      <div className="relative h-48 bg-gray-950/50">
-        <img 
-          src="https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-          alt="Event Production"
-          className="w-full h-full object-cover opacity-70"
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <GiTheaterCurtains className="text-white text-6xl opacity-50" />
-        </div>
-      </div>
-      <div className="p-6 h-full flex flex-col">
-        <h3 className="text-2xl font-bold text-white mb-4">Elevate Your Event</h3>
-        <p className="text-gray-300 mb-8">
-          Premium stage, sound, and lighting rentals for concerts, corporate 
-          events, and special occasions.
-        </p>
-        
-        <div className="mt-auto space-y-6">
-          <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-full font-bold transition-colors">
-            Get a Quote
-          </button>
-          
-          <div className="border-t border-gray-700 pt-6">
-            <h4 className="text-lg font-semibold text-white mb-4">Our Services</h4>
-            <ul className="space-y-3 text-gray-300">
-              <li className="flex items-center">
-                <GiMicrophone className="mr-3 text-yellow-400" /> Professional Audio
-              </li>
-              <li className="flex items-center">
-                <GiTheaterCurtains className="mr-3 text-yellow-400" /> Stage Design
-              </li>
-              <li className="flex items-center">
-                <FaStar className="mr-3 text-yellow-400" /> Lighting Solutions
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  </div>
-</section>
       </div>
 
       {/* Footer */}
@@ -624,7 +626,6 @@ export default function Home() {
           <p className="text-xs mt-6">© {new Date().getFullYear()} TicketsToMyShow.com — All rights reserved</p>
         </div>
       </footer>
-
     </main>
   );
 }
