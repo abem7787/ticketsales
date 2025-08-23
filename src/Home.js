@@ -104,8 +104,11 @@ export default function Home() {
     };
   }, [lastScrollY]);
 
+
   return (
+
     <main className="bg-black text-white min-h-screen flex flex-col font-sans overflow-hidden">
+
       {/* Navigation */}
       <motion.nav
         className={`fixed w-full bg-black/90 backdrop-blur-sm text-white py-5 px-8 flex justify-between items-center z-50 transition-all duration-500 ${navHidden ? 'hidden' : 'block'}`}
@@ -138,40 +141,60 @@ export default function Home() {
           </motion.button>
         </div>
 
-        <motion.ul
-          className={`${menuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row absolute md:static top-28 left-0 w-full md:w-auto bg-black/95 md:bg-transparent px-8 py-6 md:p-0 space-y-6 md:space-y-0 md:space-x-10`}
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 1 }}
-        >
-          {["Home", "Events", "sell tickets", "contact us", "Rentals", "Login"].map((item) => (
-            <motion.li
-              key={item}
-              className="w-full md:w-auto"
-              whileHover={{
-                y: -2,
-                transition: { type: 'spring', stiffness: 100, damping: 10 }
-              }}
-              transition={{ type: 'spring', stiffness: 200 }}
-            >
-              {item.toLowerCase() === 'sell tickets' ? (
-                <Link
-                  to="/sell-tickets"
-                  className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
-                >
-                  {item.toUpperCase()}
-                </Link>
-              ) : (
-                <a
-                  href={`#${item.toLowerCase().replace(' ', '-')}`}
-                  className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
-                >
-                  {item.toUpperCase()}
-                </a>
-              )}
-            </motion.li>
-          ))}
-        </motion.ul>
+       <motion.ul
+  className={`${menuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row absolute md:static top-28 left-0 w-full md:w-auto bg-black/95 md:bg-transparent px-8 py-6 md:p-0 space-y-6 md:space-y-0 md:space-x-10`}
+  initial={{ y: -20, opacity: 0 }}
+  animate={{ y: 0, opacity: 1 }}
+  transition={{ duration: 1 }}
+>
+  {["Home", "Events", "sell tickets", "contact us", "Login", "Sign up"].map((item) => {
+    const lower = item.toLowerCase();
+
+    return (
+      <motion.li
+        key={item}
+        className="w-full md:w-auto"
+        whileHover={{
+          y: -2,
+          transition: { type: "spring", stiffness: 100, damping: 10 },
+        }}
+        transition={{ type: "spring", stiffness: 200 }}
+      >
+        {lower === "sell tickets" ? (
+          <Link
+            to="/sell-tickets"
+            className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
+          >
+            {item.toUpperCase()}
+          </Link>
+        ) : lower === "login" ? (
+          <Link
+            to="/login"
+            className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
+          >
+            {item.toUpperCase()}
+          </Link>
+        ) : lower === "sign up" ? (
+          <Link
+            to="/signup"
+            className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
+          >
+            {item.toUpperCase()}
+          </Link>
+        ) : (
+          <a
+            href={`#${lower.replace(" ", "-")}`}
+            className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
+          >
+            {item.toUpperCase()}
+          </a>
+        )}
+      </motion.li>
+    );
+  })}
+</motion.ul>
+
+
       </motion.nav>
 
       <div className="flex-grow pt-32 md:pt-40 relative z-10">
@@ -287,7 +310,7 @@ export default function Home() {
 
         {/* Centered Cards Section */}
         <section className="py-16 px-6 bg-black">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
@@ -306,8 +329,8 @@ export default function Home() {
                 className="bg-gradient-to-br from-purple-900/80 to-blue-900/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50 w-full max-w-md mx-auto"
               >
                 <div className="relative h-48 bg-purple-950/50">
-                  <img 
-                    src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                  <img
+                    src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
                     alt="Music Festival"
                     className="w-full h-full object-cover opacity-70"
                   />
@@ -320,7 +343,7 @@ export default function Home() {
                   <p className="text-gray-300 mb-4">June 15-17, 2023</p>
                   <p className="text-gray-300 mb-6">Downtown Arena</p>
                   <p className="text-gray-200 mb-6">
-                    The biggest electronic music festival of the year featuring top DJs from around the world. 
+                    The biggest electronic music festival of the year featuring top DJs from around the world.
                     Three days of non-stop music, art installations, and unforgettable experiences.
                   </p>
                   <div className="flex items-center justify-between">
@@ -343,8 +366,8 @@ export default function Home() {
                 className="bg-gradient-to-br from-green-900/80 to-emerald-900/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50 w-full max-w-md mx-auto"
               >
                 <div className="relative h-48 bg-emerald-950/50">
-                  <img 
-                    src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80" 
+                  <img
+                    src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80"
                     alt="Crypto Purchase"
                     className="w-full h-full object-cover opacity-70"
                   />
@@ -393,8 +416,8 @@ export default function Home() {
                 className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50 w-full max-w-md mx-auto"
               >
                 <div className="relative h-48 bg-gray-950/50">
-                  <img 
-                    src="https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                  <img
+                    src="https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
                     alt="Event Production"
                     className="w-full h-full object-cover opacity-70"
                   />
@@ -405,15 +428,15 @@ export default function Home() {
                 <div className="p-6 h-full flex flex-col">
                   <h3 className="text-2xl font-bold text-white mb-4">Elevate Your Event</h3>
                   <p className="text-gray-300 mb-8">
-                    Premium stage, sound, and lighting rentals for concerts, corporate 
+                    Premium stage, sound, and lighting rentals for concerts, corporate
                     events, and special occasions.
                   </p>
-                  
+
                   <div className="mt-auto space-y-6">
                     <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-full font-bold transition-colors">
                       Get a Quote
                     </button>
-                    
+
                     <div className="border-t border-gray-700 pt-6">
                       <h4 className="text-lg font-semibold text-white mb-4">Our Services</h4>
                       <ul className="space-y-3 text-gray-300">
