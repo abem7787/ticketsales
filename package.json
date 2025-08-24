@@ -24,7 +24,6 @@
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.487.0",
-    "mysql2": "^3.14.3",
     "qrcode.react": "^4.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -62,19 +61,5 @@
     "autoprefixer": "^10.4.21",
     "nodemon": "^3.1.10",
     "postcss": "^8.5.3"
-  },
-  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
-  "main": "tailwind.config.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/abem7787/ticketsales.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/abem7787/ticketsales/issues"
-  },
-  "homepage": "https://github.com/abem7787/ticketsales#readme"
+  }
 }

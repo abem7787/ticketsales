@@ -31,9 +31,8 @@ const SeatingChart = () => {
   const [seatType, setSeatType] = useState("Standard");
   const [showModal, setShowModal] = useState(false);
 
-  const toggleSeat = React.useCallback((rowIndex, colIndex) => {
-  setSeats(prevSeats => {
-    const updated = [...prevSeats];
+  const toggleSeat = (rowIndex, colIndex) => {
+    const updated = [...seats];
     const seat = updated[rowIndex][colIndex];
 
     if (seat.status === "available") {
@@ -44,9 +43,8 @@ const SeatingChart = () => {
       seat.type = null;
     }
 
-    return updated;
-  });
-}, [seatType]);
+    setSeats(updated);
+  };
 
   const getColor = (seat) => {
     if (seat.status === "selected") {
