@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import SellTickets from '../src/components/SellTickets';
 import SeatingChart from '../src/components/SeatingChart';
+import SignUp from "../src/components/SignUp"
 
 
 
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/sell-tickets" element={<SellTickets />} />
         <Route path="/chart-seating" element={<SeatingChart />} />
+          <Route path="/signup" element={<SignUp/>} />
       </Routes>
 
   );
