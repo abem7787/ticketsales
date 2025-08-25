@@ -37,6 +37,18 @@ async function initDatabase() {
       queueLimit: 0,
     });
 
+    // --- CREATE USERS TABLE ---
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log("Users table is ready.");
+
     return pool;
   } catch (err) {
     console.error("Database initialization error:", err);
@@ -56,8 +68,6 @@ async function initDatabase() {
       credentials: true,
     })
   );
-
-  const users = [];
 
   // JWT helpers
   function signAuthToken(userId) {
@@ -85,21 +95,20 @@ async function initDatabase() {
     }
 
     const emailLower = email.toLowerCase().trim();
-    const exists = users.find((u) => u.email === emailLower);
-    if (exists) return res.status(409).json({ error: "Email already registered." });
-
-    const passwordHash = await bcrypt.hash(password, 12);
 
     try {
+      // Check if email already exists
+      const [rows] = await db.query("SELECT id FROM users WHERE email = ?", [emailLower]);
+      if (rows.length > 0) return res.status(409).json({ error: "Email already registered." });
+
+      const passwordHash = await bcrypt.hash(password, 12);
+
       const [results] = await db.query(
         "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
         [name.trim(), emailLower, passwordHash]
       );
 
       const id = results.insertId;
-      const user = { id, name: name.trim(), email: emailLower };
-      users.push(user);
-
       const token = signAuthToken(id);
       res.cookie("token", token, {
         httpOnly: true,
@@ -108,7 +117,7 @@ async function initDatabase() {
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
 
-      return res.status(201).json({ user });
+      return res.status(201).json({ user: { id, name: name.trim(), email: emailLower } });
     } catch (err) {
       console.error("MySQL insert error:", err);
       return res.status(500).json({ error: "Database error" });
@@ -116,10 +125,15 @@ async function initDatabase() {
   });
 
   // Get current user
-  app.get("/api/auth/me", requireAuth, (req, res) => {
-    const me = users.find((u) => u.id === req.userId);
-    if (!me) return res.status(404).json({ error: "User not found" });
-    res.json({ user: me });
+  app.get("/api/auth/me", requireAuth, async (req, res) => {
+    try {
+      const [rows] = await db.query("SELECT id, name, email FROM users WHERE id = ?", [req.userId]);
+      if (rows.length === 0) return res.status(404).json({ error: "User not found" });
+      res.json({ user: rows[0] });
+    } catch (err) {
+      console.error("MySQL select error:", err);
+      res.status(500).json({ error: "Database error" });
+    }
   });
 
   const port = process.env.PORT || 5000;
