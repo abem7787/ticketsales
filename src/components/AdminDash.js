@@ -34,6 +34,12 @@ const AdminDashboard = () => {
               <span>Refunds</span>
             </Link>
           </li>
+            <li className="mb-6">
+            <Link to="/chart-seating" className="flex items-center space-x-3">
+              <FaUserShield className="text-xl" />
+              <span>Create Event</span>
+            </Link>
+          </li>
         </ul>
       </div>
 
