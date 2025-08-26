@@ -1,100 +1,215 @@
-import React, { useState } from "react";
-import { QRCodeCanvas } from "qrcode.react";
+import React, { useState } from 'react';
+
+const rows = 6;
+const cols = 12;
+const initialSeatPrices = {
+  Standard: 50,
+  VIP: 200,
+  Reserved: 500,
+};
+
+const serviceFeePercentage = 0.05; // 5% service fee
+
+const initialSeats = () => {
+  const seats = [];
+  for (let r = 0; r < rows; r++) {
+    const row = [];
+    for (let c = 0; c < cols; c++) {
+      row.push({
+        id: `${r}-${c}`,
+        status: 'available',
+        type: null,
+      });
+    }
+    seats.push(row);
+  }
+  return seats;
+};
 
 const SeatingChart = () => {
-  // Seat types and initial prices
-  const [seatPrices, setSeatPrices] = useState({
-    Standard: 50,
-    VIP: 200,
-    Reserved: 500,
-  });
+  const [seats, setSeats] = useState(initialSeats());
+  const [seatType, setSeatType] = useState('Standard');
+  const [seatPrices, setSeatPrices] = useState(initialSeatPrices);
+  const [showModal, setShowModal] = useState(false);
 
-  // Sample seats layout
-  const seats = [
-    { id: 1, type: "Standard" },
-    { id: 2, type: "Standard" },
-    { id: 3, type: "VIP" },
-    { id: 4, type: "Reserved" },
-    { id: 5, type: "VIP" },
-  ];
+  const toggleSeat = (rowIndex, colIndex) => {
+    const updated = [...seats];
+    const seat = updated[rowIndex][colIndex];
 
-  const [selectedSeats, setSelectedSeats] = useState([]);
-
-  const serviceFeePercentage = 0.1;
-
-  // Handle seat selection
-  const toggleSeat = (seat) => {
-    if (selectedSeats.includes(seat)) {
-      setSelectedSeats(selectedSeats.filter((s) => s !== seat));
+    if (seat.status === 'available') {
+      seat.status = 'selected';
+      seat.type = seatType;
     } else {
-      setSelectedSeats([...selectedSeats, seat]);
+      seat.status = 'available';
+      seat.type = null;
     }
+
+    setSeats(updated);
   };
 
-  const subtotal = selectedSeats.reduce(
-    (sum, seat) => sum + seatPrices[seat.type],
-    0
-  );
+  const getColor = (seat) => {
+    if (seat.status === 'selected') {
+      if (seat.type === 'VIP') return 'bg-yellow-400';
+      if (seat.type === 'Reserved') return 'bg-red-500';
+      return 'bg-blue-500'; // Standard
+    }
+    return 'bg-gray-300 hover:bg-gray-400'; // Available
+  };
+
+  const selectedSeats = seats.flat().filter((seat) => seat.status === 'selected');
+  const subtotal = selectedSeats.reduce((sum, seat) => sum + seatPrices[seat.type], 0);
   const serviceFee = subtotal * serviceFeePercentage;
   const total = subtotal + serviceFee;
 
-  return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Seating Chart</h2>
+  const handlePriceChange = (type, value) => {
+    setSeatPrices({
+      ...seatPrices,
+      [type]: Number(value),
+    });
+  };
 
-      {/* Admin inputs to change prices */}
-      <div className="flex justify-center gap-4 mb-6">
-        {Object.keys(seatPrices).map((type) => (
+  return (
+    <div className="p-8 max-w-5xl mx-auto space-y-8 bg-white rounded-2xl shadow-xl">
+      <h2 className="text-2xl font-bold text-center">Event Seating Chart</h2>
+
+      {/* Seat Type Selector */}
+      <div className="flex justify-center gap-4">
+        <select
+          value={seatType}
+          onChange={(e) => setSeatType(e.target.value)}
+          className="border p-2 rounded-md"
+        >
+          <option value="Standard">Standard Seat (${seatPrices.Standard})</option>
+          <option value="VIP">VIP Seat (${seatPrices.VIP})</option>
+          <option value="Reserved">Reserved Seat (${seatPrices.Reserved})</option>
+        </select>
+      </div>
+
+      {/* Price Inputs */}
+      <div className="flex justify-center gap-6 mt-4">
+        {['Standard', 'VIP', 'Reserved'].map((type) => (
           <div key={type} className="flex flex-col items-center">
-            <label className="font-semibold">{type} Price ($)</label>
+            <label className="font-medium">{type} Price</label>
             <input
               type="number"
               value={seatPrices[type]}
-              min={0}
-              className="border rounded p-1 w-20 text-center"
-              onChange={(e) =>
-                setSeatPrices({
-                  ...seatPrices,
-                  [type]: Number(e.target.value),
-                })
-              }
+              onChange={(e) => handlePriceChange(type, e.target.value)}
+              className="border p-1 rounded w-20 text-center"
             />
           </div>
         ))}
       </div>
 
-      {/* Seats display */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
-        {seats.map((seat) => (
-          <button
-            key={seat.id}
-            onClick={() => toggleSeat(seat)}
-            className={`p-4 rounded border ${
-              selectedSeats.includes(seat)
-                ? "bg-green-500 text-white"
-                : "bg-gray-200"
-            }`}
-          >
-            {seat.type} ${seatPrices[seat.type]}
-          </button>
+      {/* Stage Label */}
+      <div className="text-center font-semibold text-lg bg-black text-white py-2 rounded mt-6">
+        Stage
+      </div>
+
+      {/* Seating Grid */}
+      <div className="space-y-2 mt-4">
+        {seats.map((row, rowIndex) => (
+          <div key={rowIndex} className="flex justify-center gap-2">
+            {row.map((seat, colIndex) => {
+              const sectionBorder = colIndex === 4 || colIndex === 8 ? 'ml-6' : '';
+              const seatLabel = `${String.fromCharCode(65 + rowIndex)}${colIndex + 1}`;
+              return (
+                <button
+                  key={seat.id}
+                  onClick={() => toggleSeat(rowIndex, colIndex)}
+                  className={`w-8 h-8 rounded-full border-2 border-gray-400 flex items-center justify-center text-xs font-semibold ${getColor(
+                    seat
+                  )} ${sectionBorder}`}
+                  title={
+                    seat.status === 'selected'
+                      ? `${seat.type} ($${seatPrices[seat.type]})`
+                      : 'Available'
+                  }
+                >
+                  {seatLabel}
+                </button>
+              );
+            })}
+          </div>
         ))}
       </div>
 
-      {/* Summary */}
-      <div className="mb-4">
-        <p>Subtotal: ${subtotal.toFixed(2)}</p>
-        <p>Service Fee: ${serviceFee.toFixed(2)}</p>
-        <p className="font-bold">Total: ${total.toFixed(2)}</p>
+      {/* Legend */}
+      <div className="flex justify-center gap-6 mt-4 text-sm">
+        <div className="flex items-center gap-2">
+          <span className="w-4 h-4 rounded-full bg-gray-300 border border-gray-400" /> Available
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-4 h-4 rounded-full bg-blue-500" /> Standard (${seatPrices.Standard})
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-4 h-4 rounded-full bg-yellow-400" /> VIP (${seatPrices.VIP})
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-4 h-4 rounded-full bg-red-500" /> Reserved (${seatPrices.Reserved})
+        </div>
       </div>
 
-      {/* QR Code for selected seats */}
-      {selectedSeats.length > 0 && (
-        <div className="mt-6">
-          <h3 className="font-semibold mb-2">Your QR Code</h3>
-          <QRCodeCanvas
-            value={JSON.stringify(selectedSeats.map((s) => s.id))}
-            size={128}
-          />
+      {/* Pricing Summary */}
+      <div className="mt-6 border-t pt-6 text-center space-y-2 text-lg">
+        {selectedSeats.length > 0 && (
+          <>
+            <p>
+              <strong>Selected Seats:</strong> {selectedSeats.length}
+            </p>
+            <p>
+              <strong>Subtotal:</strong> ${subtotal}
+            </p>
+            <p>
+              <strong>Service Fee (5%):</strong> ${serviceFee.toFixed(2)}
+            </p>
+            <p className="text-xl font-bold">
+              <strong>Total:</strong> ${total.toFixed(2)}
+            </p>
+          </>
+        )}
+
+        <button
+          onClick={() => setShowModal(true)}
+          disabled={selectedSeats.length === 0}
+          className={`mt-4 px-6 py-3 font-semibold rounded-lg ${
+            selectedSeats.length === 0
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-green-600 text-white hover:bg-green-700'
+          }`}
+        >
+          Proceed to Checkout
+        </button>
+      </div>
+
+      {/* Payment Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md text-center space-y-4">
+            <h3 className="text-xl font-semibold">Confirm Payment</h3>
+            <p>
+              Total: <strong>${total.toFixed(2)}</strong> for {selectedSeats.length} seat(s)
+            </p>
+            <div className="flex justify-center gap-4 mt-4">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  alert('Payment successful!');
+                  setSeats(initialSeats());
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Confirm Payment
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+
+            
+          </div>
         </div>
       )}
     </div>
