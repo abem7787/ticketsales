@@ -1,25 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import {useNavigate} from "react-router-dom"
+import TicketWithQR from "./TicketWithQR"; // import your QR ticket component
 
 const rows = 6;
 const cols = 12;
-const initialSeatPrices = {
-  Standard: 50,
-  VIP: 200,
-  Reserved: 500,
-};
-
-const serviceFeePercentage = 0.05; // 5% service fee
+const initialSeatPrices = { Standard: 50, VIP: 200, Reserved: 500 };
+const serviceFeePercentage = 0.05;
 
 const initialSeats = () => {
   const seats = [];
   for (let r = 0; r < rows; r++) {
     const row = [];
     for (let c = 0; c < cols; c++) {
-      row.push({
-        id: `${r}-${c}`,
-        status: 'available',
-        type: null,
-      });
+      row.push({ id: `${r}-${c}`, status: "available", type: null });
     }
     seats.push(row);
   }
@@ -28,51 +21,54 @@ const initialSeats = () => {
 
 const SeatingChart = () => {
   const [seats, setSeats] = useState(initialSeats());
-  const [seatType, setSeatType] = useState('Standard');
+  const [seatType, setSeatType] = useState("Standard");
   const [seatPrices, setSeatPrices] = useState(initialSeatPrices);
   const [showModal, setShowModal] = useState(false);
+  const [tickets, setTickets] = useState([]); // tickets with QR codes
+ const navigate = useNavigate();
 
   const toggleSeat = (rowIndex, colIndex) => {
     const updated = [...seats];
     const seat = updated[rowIndex][colIndex];
-
-    if (seat.status === 'available') {
-      seat.status = 'selected';
+    if (seat.status === "available") {
+      seat.status = "selected";
       seat.type = seatType;
     } else {
-      seat.status = 'available';
+      seat.status = "available";
       seat.type = null;
     }
-
     setSeats(updated);
   };
 
-  const getColor = (seat) => {
-    if (seat.status === 'selected') {
-      if (seat.type === 'VIP') return 'bg-yellow-400';
-      if (seat.type === 'Reserved') return 'bg-red-500';
-      return 'bg-blue-500'; // Standard
-    }
-    return 'bg-gray-300 hover:bg-gray-400'; // Available
-  };
-
-  const selectedSeats = seats.flat().filter((seat) => seat.status === 'selected');
+  const selectedSeats = seats.flat().filter((seat) => seat.status === "selected");
   const subtotal = selectedSeats.reduce((sum, seat) => sum + seatPrices[seat.type], 0);
   const serviceFee = subtotal * serviceFeePercentage;
   const total = subtotal + serviceFee;
 
   const handlePriceChange = (type, value) => {
-    setSeatPrices({
-      ...seatPrices,
-      [type]: Number(value),
-    });
+    setSeatPrices({ ...seatPrices, [type]: Number(value) });
+  };
+
+  const handleCheckout = () => {
+    // Generate tickets for selected seats
+    const newTickets = selectedSeats.map((seat) => ({
+      id: `${seat.id}-${Date.now()}`,
+      seat: seat.id,
+      price: seatPrices[seat.type],
+      event: "Demo Event",
+    }));
+    // setTickets(newTickets);
+    // setShowModal(true);
+       navigate("/tickets", { state: { tickets } });
+
+
   };
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8 bg-white rounded-2xl shadow-xl">
       <h2 className="text-2xl font-bold text-center">Event Seating Chart</h2>
 
-      {/* Seat Type Selector */}
+      {/* Seat Selector */}
       <div className="flex justify-center gap-4">
         <select
           value={seatType}
@@ -87,7 +83,7 @@ const SeatingChart = () => {
 
       {/* Price Inputs */}
       <div className="flex justify-center gap-6 mt-4">
-        {['Standard', 'VIP', 'Reserved'].map((type) => (
+        {["Standard", "VIP", "Reserved"].map((type) => (
           <div key={type} className="flex flex-col items-center">
             <label className="font-medium">{type} Price</label>
             <input
@@ -110,19 +106,25 @@ const SeatingChart = () => {
         {seats.map((row, rowIndex) => (
           <div key={rowIndex} className="flex justify-center gap-2">
             {row.map((seat, colIndex) => {
-              const sectionBorder = colIndex === 4 || colIndex === 8 ? 'ml-6' : '';
+              const sectionBorder = colIndex === 4 || colIndex === 8 ? "ml-6" : "";
               const seatLabel = `${String.fromCharCode(65 + rowIndex)}${colIndex + 1}`;
               return (
                 <button
                   key={seat.id}
                   onClick={() => toggleSeat(rowIndex, colIndex)}
-                  className={`w-8 h-8 rounded-full border-2 border-gray-400 flex items-center justify-center text-xs font-semibold ${getColor(
-                    seat
-                  )} ${sectionBorder}`}
+                  className={`w-8 h-8 rounded-full border-2 border-gray-400 flex items-center justify-center text-xs font-semibold ${
+                    seat.status === "selected"
+                      ? seat.type === "VIP"
+                        ? "bg-yellow-400"
+                        : seat.type === "Reserved"
+                        ? "bg-red-500"
+                        : "bg-blue-500"
+                      : "bg-gray-300 hover:bg-gray-400"
+                  } ${sectionBorder}`}
                   title={
-                    seat.status === 'selected'
+                    seat.status === "selected"
                       ? `${seat.type} ($${seatPrices[seat.type]})`
-                      : 'Available'
+                      : "Available"
                   }
                 >
                   {seatLabel}
@@ -169,46 +171,37 @@ const SeatingChart = () => {
         )}
 
         <button
-          onClick={() => setShowModal(true)}
+          onClick={handleCheckout}
           disabled={selectedSeats.length === 0}
           className={`mt-4 px-6 py-3 font-semibold rounded-lg ${
             selectedSeats.length === 0
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-green-600 text-white hover:bg-green-700'
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-600 text-white hover:bg-green-700"
           }`}
         >
           Proceed to Checkout
         </button>
       </div>
 
-      {/* Payment Modal */}
+      {/* Payment Modal with QR Tickets */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50 p-4 overflow-auto">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md text-center space-y-4">
-            <h3 className="text-xl font-semibold">Confirm Payment</h3>
-            <p>
-              Total: <strong>${total.toFixed(2)}</strong> for {selectedSeats.length} seat(s)
-            </p>
-            <div className="flex justify-center gap-4 mt-4">
-              <button
-                onClick={() => {
-                  setShowModal(false);
-                  alert('Payment successful!');
-                  setSeats(initialSeats());
-                }}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                Confirm Payment
-              </button>
-              <button
-                onClick={() => setShowModal(false)}
-                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-            </div>
+            <h3 className="text-xl font-semibold">Your Tickets</h3>
+            {tickets.map((ticket) => (
+              <TicketWithQR key={ticket.id} ticket={ticket} />
+            ))}
 
-            
+            <button
+              onClick={() => {
+                setShowModal(false);
+                setSeats(initialSeats());
+                setTickets([]);
+              }}
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

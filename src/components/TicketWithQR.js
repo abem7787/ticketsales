@@ -1,23 +1,13 @@
-// src/components/TicketWithQR.jsx
-import React from 'react';
-import QRCode from 'qrcode.react';
+import React from "react";
+import { QRCodeCanvas } from "qrcode.react"; // <-- use named import
 
 const TicketWithQR = ({ ticket }) => {
-  const qrData = JSON.stringify({
-    seat: ticket.seat,
-    price: ticket.price,
-    event: ticket.event,
-    id: ticket.id
-  });
-
   return (
-    <div className="bg-slate-800 p-4 rounded-lg shadow-md text-white">
-      <h4 className="font-semibold mb-2">Seat: {ticket.seat}</h4>
-      <p>Event: {ticket.event}</p>
+    <div className="ticket p-4 border rounded shadow space-y-2">
+      <h2 className="font-bold text-lg">{ticket.event}</h2>
+      <p>Seat: {ticket.seat}</p>
       <p>Price: ${ticket.price}</p>
-      <div className="mt-4 flex justify-center">
-        <QRCode value={qrData} size={100} />
-      </div>
+      <QRCodeCanvas value={JSON.stringify(ticket)} size={128} />
     </div>
   );
 };
