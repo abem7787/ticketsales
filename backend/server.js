@@ -1,143 +1,63 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const cookieParser = require("cookie-parser");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const mysql = require("mysql2/promise"); // use promise-based API
+// server.js
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-dotenv.config();
+const app = express();
+app.use(express.json());
+app.use(cookieParser());
 
-// Initialize database
-async function initDatabase() {
-  try {
-    // Connect without specifying a database
-    const connection = await mysql.createConnection({
-      host: process.env.DB_HOST || "localhost",
-      user: process.env.DB_USER || "root",
-      password: process.env.DB_PASSWORD || "Blueray87$",
-      port: process.env.DB_PORT || 3306,
-    });
+// Allow requests from React frontend
+app.use(
+  cors({
+    origin: "http://localhost:3000", // React frontend
+    credentials: true,
+  })
+);
 
-    // Create the database if it doesn't exist
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME || "Tickets"}\``);
-    console.log(`Database '${process.env.DB_NAME || "Tickets"}' is ready.`);
+// In-memory "database" for demo
+const users = [];
 
-    await connection.end();
-
-    // Now create a pool connected to the database
-    const pool = mysql.createPool({
-      host: process.env.DB_HOST || "localhost",
-      user: process.env.DB_USER || "root",
-      password: process.env.DB_PASSWORD || "Blueray87$",
-      database: process.env.DB_NAME || "Tickets",
-      port: process.env.DB_PORT || 3306,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-    });
-
-    // --- CREATE USERS TABLE ---
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log("Users table is ready.");
-
-    return pool;
-  } catch (err) {
-    console.error("Database initialization error:", err);
-    process.exit(1);
-  }
+// JWT helper
+const JWT_SECRET = "supersecret";
+function signAuthToken(userId) {
+  return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: "7d" });
 }
 
-(async () => {
-  const db = await initDatabase();
+// Register endpoint
+app.post("/api/auth/register", async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) return res.status(400).json({ error: "All fields required" });
 
-  const app = express();
-  app.use(express.json());
-  app.use(cookieParser());
-  app.use(
-    cors({
-      origin: "http://localhost:3000",
-      credentials: true,
-    })
-  );
+  const exists = users.find(u => u.email === email.toLowerCase());
+  if (exists) return res.status(409).json({ error: "Email already exists" });
 
-  // JWT helpers
-  function signAuthToken(userId) {
-    return jwt.sign({ sub: userId }, process.env.JWT_SECRET || "secret", { expiresIn: "7d" });
-  }
+  const hashed = await bcrypt.hash(password, 12);
+  const user = { id: users.length + 1, name, email: email.toLowerCase(), password: hashed };
+  users.push(user);
 
-  function requireAuth(req, res, next) {
-    const token = req.cookies?.token;
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
+  const token = signAuthToken(user.id);
+  res.cookie("token", token, { httpOnly: true, sameSite: "lax" });
+  res.status(201).json({ user: { id: user.id, name: user.name, email: user.email } });
+});
 
-    try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET || "secret");
-      req.userId = payload.sub;
-      next();
-    } catch {
-      return res.status(401).json({ error: "Invalid or expired token" });
-    }
-  }
+// Login endpoint
+app.post("/api/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ error: "Email and password required" });
 
-  // Registration endpoint
-  app.post("/api/auth/register", async (req, res) => {
-    const { name, email, password } = req.body || {};
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: "Name, email, and password are required." });
-    }
+  const user = users.find(u => u.email === email.toLowerCase());
+  if (!user) return res.status(401).json({ error: "Invalid email or password" });
 
-    const emailLower = email.toLowerCase().trim();
+  const valid = await bcrypt.compare(password, user.password);
+  if (!valid) return res.status(401).json({ error: "Invalid email or password" });
 
-    try {
-      // Check if email already exists
-      const [rows] = await db.query("SELECT id FROM users WHERE email = ?", [emailLower]);
-      if (rows.length > 0) return res.status(409).json({ error: "Email already registered." });
+  const token = signAuthToken(user.id);
+  res.cookie("token", token, { httpOnly: true, sameSite: "lax" });
+  res.json({ user: { id: user.id, name: user.name, email: user.email } });
+});
 
-      const passwordHash = await bcrypt.hash(password, 12);
-
-      const [results] = await db.query(
-        "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-        [name.trim(), emailLower, passwordHash]
-      );
-
-      const id = results.insertId;
-      const token = signAuthToken(id);
-      res.cookie("token", token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: false,
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
-
-      return res.status(201).json({ user: { id, name: name.trim(), email: emailLower } });
-    } catch (err) {
-      console.error("MySQL insert error:", err);
-      return res.status(500).json({ error: "Database error" });
-    }
-  });
-
-  // Get current user
-  app.get("/api/auth/me", requireAuth, async (req, res) => {
-    try {
-      const [rows] = await db.query("SELECT id, name, email FROM users WHERE id = ?", [req.userId]);
-      if (rows.length === 0) return res.status(404).json({ error: "User not found" });
-      res.json({ user: rows[0] });
-    } catch (err) {
-      console.error("MySQL select error:", err);
-      res.status(500).json({ error: "Database error" });
-    }
-  });
-
-  const port = process.env.PORT || 5000;
-  app.listen(port, () => {
-    console.log(`API running at http://localhost:${port}`);
-  });
-})();
+const port = 5000;
+app.listen(port, () => console.log(`API running at http://localhost:${port}`));

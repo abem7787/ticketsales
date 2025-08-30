@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import {useNavigate} from "react-router-dom"
-import TicketWithQR from "./TicketWithQR"; // import your QR ticket component
+import { useNavigate } from "react-router-dom";
 
 const rows = 6;
 const cols = 12;
@@ -23,9 +22,8 @@ const SeatingChart = () => {
   const [seats, setSeats] = useState(initialSeats());
   const [seatType, setSeatType] = useState("Standard");
   const [seatPrices, setSeatPrices] = useState(initialSeatPrices);
-  const [showModal, setShowModal] = useState(false);
-  const [tickets, setTickets] = useState([]); // tickets with QR codes
- const navigate = useNavigate();
+  const [eventName, setEventName] = useState("Demo Event"); // New event name state
+  const navigate = useNavigate();
 
   const toggleSeat = (rowIndex, colIndex) => {
     const updated = [...seats];
@@ -49,27 +47,42 @@ const SeatingChart = () => {
     setSeatPrices({ ...seatPrices, [type]: Number(value) });
   };
 
-  const handleCheckout = () => {
-    // Generate tickets for selected seats
-    const newTickets = selectedSeats.map((seat) => ({
+const handleCheckout = () => {
+  if (selectedSeats.length === 0) return;
+
+  // Generate tickets for selected seats with proper seat label
+  const tickets = selectedSeats.map((seat) => {
+    const [rowIndex, colIndex] = seat.id.split("-").map(Number);
+    const seatLabel = `${String.fromCharCode(65 + rowIndex)}${colIndex + 1}`; // A1, B3, etc.
+
+    return {
       id: `${seat.id}-${Date.now()}`,
-      seat: seat.id,
+      seat: seatLabel, // use seat label instead of internal ID
       price: seatPrices[seat.type],
-      event: "Demo Event",
-    }));
-    // setTickets(newTickets);
-    // setShowModal(true);
-       navigate("/tickets", { state: { tickets } });
+      event: eventName,
+    };
+  });
 
-
-  };
+  navigate("/tickets", { state: { tickets } });
+};
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8 bg-white rounded-2xl shadow-xl">
       <h2 className="text-2xl font-bold text-center">Event Seating Chart</h2>
 
+      {/* Event Name Input */}
+      <div className="flex justify-center mt-4">
+        <input
+          type="text"
+          value={eventName}
+          onChange={(e) => setEventName(e.target.value)}
+          placeholder="Enter Event Name"
+          className="border p-2 rounded-md w-80 text-center"
+        />
+      </div>
+
       {/* Seat Selector */}
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center gap-4 mt-4">
         <select
           value={seatType}
           onChange={(e) => setSeatType(e.target.value)}
@@ -182,29 +195,6 @@ const SeatingChart = () => {
           Proceed to Checkout
         </button>
       </div>
-
-      {/* Payment Modal with QR Tickets */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50 p-4 overflow-auto">
-          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md text-center space-y-4">
-            <h3 className="text-xl font-semibold">Your Tickets</h3>
-            {tickets.map((ticket) => (
-              <TicketWithQR key={ticket.id} ticket={ticket} />
-            ))}
-
-            <button
-              onClick={() => {
-                setShowModal(false);
-                setSeats(initialSeats());
-                setTickets([]);
-              }}
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

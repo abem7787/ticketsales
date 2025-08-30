@@ -22,11 +22,13 @@ const TicketsPage = () => {
   }
 
   return (
-    <div className="p-8 max-w-3xl mx-auto space-y-4">
-      <h2 className="text-2xl font-bold text-center">Your Tickets</h2>
-      {tickets.map((ticket) => (
-        <TicketWithQR key={ticket.id} ticket={ticket} />
-      ))}
+    <div className="p-8 max-w-6xl mx-auto">
+      <h2 className="text-2xl font-bold text-center mb-6">Your Tickets</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+        {tickets.map((ticket) => (
+          <TicketWithQR key={ticket.id} ticket={ticket} className="w-32 h-44" />
+        ))}
+      </div>
     </div>
   );
 };

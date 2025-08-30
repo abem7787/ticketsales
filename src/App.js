@@ -1,26 +1,26 @@
-// App.js
 import React from 'react';
-import {  Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Home from './Home';
-import SellTickets from '../src/components/SellTickets';
-import SeatingChart from '../src/components/SeatingChart';
-import SignUp from "../src/components/SignUp"
-import AdminDash from "../src/components/AdminDash"
-import TicketsPage from "../src/components/TicketsPage";
-
+import SellTickets from './components/SellTickets';
+import SeatingChart from './components/SeatingChart';
+import SignUp from './components/SignUp';
+import AdminDash from './components/AdminDash';
+import TicketsPage from './components/TicketsPage';
+import CustomerPortal from './components/CustomerPortal';
+import Login from './components/Login';
 
 function App() {
   return (
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/sell-tickets" element={<SellTickets />} />
-        <Route path="/chart-seating" element={<SeatingChart />} />
-          <Route path="/signup" element={<SignUp/>} />
-             <Route path="/dashboard" element={<AdminDash/>} />
-              <Route path="/tickets" element={<TicketsPage />} />
-      </Routes>
-
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/sell-tickets" element={<SellTickets />} />
+      <Route path="/chart-seating" element={<SeatingChart />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/dashboard" element={<AdminDash />} />
+      <Route path="/tickets" element={<TicketsPage />} />
+      <Route path="/customerPortal" element={<CustomerPortal />} />
+    </Routes>
   );
 }
 
