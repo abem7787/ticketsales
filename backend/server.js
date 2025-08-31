@@ -1,4 +1,3 @@
-// server.js
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -10,12 +9,24 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Allow requests from React frontend
-app.use(
-  cors({
-    origin: "http://localhost:3000", // React frontend
-    credentials: true,
-  })
-);
+const allowedOrigins = [
+  "http://localhost:3002",
+  "http://localhost:3003",
+  "http://10.5.0.2:3002"
+];
+app.use(cors({
+  origin: function(origin, callback){
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // required for cookies/auth headers
+}));
+
+// Handle preflight OPTIONS requests for all routes
+app.options("*", cors({ origin: allowedOrigins, credentials: true }));
 
 // In-memory "database" for demo
 const users = [];
@@ -39,7 +50,7 @@ app.post("/api/auth/register", async (req, res) => {
   users.push(user);
 
   const token = signAuthToken(user.id);
-  res.cookie("token", token, { httpOnly: true, sameSite: "lax" });
+  res.cookie("token", token, { httpOnly: true, sameSite: "lax", secure: false });
   res.status(201).json({ user: { id: user.id, name: user.name, email: user.email } });
 });
 
@@ -55,8 +66,14 @@ app.post("/api/auth/login", async (req, res) => {
   if (!valid) return res.status(401).json({ error: "Invalid email or password" });
 
   const token = signAuthToken(user.id);
-  res.cookie("token", token, { httpOnly: true, sameSite: "lax" });
+  res.cookie("token", token, { httpOnly: true, sameSite: "lax", secure: false });
   res.json({ user: { id: user.id, name: user.name, email: user.email } });
+});
+
+// Optional: logout endpoint
+app.post("/api/auth/logout", (req, res) => {
+  res.clearCookie("token", { httpOnly: true, sameSite: "lax", secure: false });
+  res.json({ message: "Logged out" });
 });
 
 const port = 5000;

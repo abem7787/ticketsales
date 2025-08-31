@@ -22,19 +22,31 @@ const SeatingChart = () => {
   const [seats, setSeats] = useState(initialSeats());
   const [seatType, setSeatType] = useState("Standard");
   const [seatPrices, setSeatPrices] = useState(initialSeatPrices);
-  const [eventName, setEventName] = useState("Demo Event"); // New event name state
+  const [eventName, setEventName] = useState("Demo Event");
+  const [seatImages, setSeatImages] = useState({
+    Standard: null,
+    VIP: null,
+    Reserved: null,
+  });
+
   const navigate = useNavigate();
 
+  // Admin toggles seat type OR disables seat
   const toggleSeat = (rowIndex, colIndex) => {
     const updated = [...seats];
     const seat = updated[rowIndex][colIndex];
+
     if (seat.status === "available") {
       seat.status = "selected";
       seat.type = seatType;
+    } else if (seat.status === "selected") {
+      seat.status = "unavailable"; // mark as blocked
+      seat.type = null;
     } else {
       seat.status = "available";
       seat.type = null;
     }
+
     setSeats(updated);
   };
 
@@ -47,30 +59,70 @@ const SeatingChart = () => {
     setSeatPrices({ ...seatPrices, [type]: Number(value) });
   };
 
-const handleCheckout = () => {
-  if (selectedSeats.length === 0) return;
+  const handleImageUpload = (type, file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => setSeatImages({ ...seatImages, [type]: reader.result });
+    reader.readAsDataURL(file);
+  };
 
-  // Generate tickets for selected seats with proper seat label
-  const tickets = selectedSeats.map((seat) => {
-    const [rowIndex, colIndex] = seat.id.split("-").map(Number);
-    const seatLabel = `${String.fromCharCode(65 + rowIndex)}${colIndex + 1}`; // A1, B3, etc.
-
-    return {
-      id: `${seat.id}-${Date.now()}`,
-      seat: seatLabel, // use seat label instead of internal ID
-      price: seatPrices[seat.type],
-      event: eventName,
+  // Save event config to localStorage
+  const handleSaveEvent = () => {
+    const eventConfig = {
+      eventName,
+      seatPrices,
+      seatImages,
+      seats,
     };
-  });
+    localStorage.setItem("eventConfig", JSON.stringify(eventConfig));
+    alert("Event configuration saved for clients!");
+  };
 
-  navigate("/tickets", { state: { tickets } });
-};
+  // Reset event config
+  const handleReset = () => {
+    localStorage.removeItem("eventConfig");
+    setSeats(initialSeats());
+    setSeatPrices(initialSeatPrices);
+    setSeatImages({ Standard: null, VIP: null, Reserved: null });
+    setEventName("Demo Event");
+    alert("Event reset!");
+  };
+
+  // Checkout for preview (Admin testing flow)
+  const handleCheckout = () => {
+    if (!selectedSeats.length) return;
+
+    const tickets = selectedSeats.map((seat) => {
+      const [rowIndex, colIndex] = seat.id.split("-").map(Number);
+      const seatLabel = `${String.fromCharCode(65 + rowIndex)}${colIndex + 1}`;
+      const ticketId = `${seat.id}-${Date.now()}`;
+
+      return {
+        id: ticketId,
+        seat: seatLabel,
+        type: seat.type,
+        price: seatPrices[seat.type],
+        event: eventName,
+        image: seatImages[seat.type],
+        qrData: JSON.stringify({
+          id: ticketId,
+          seat: seatLabel,
+          price: seatPrices[seat.type],
+          event: eventName,
+        }),
+      };
+    });
+
+    navigate("/tickets", {
+      state: { tickets, subtotal, serviceFee, total },
+    });
+  };
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-8 bg-white rounded-2xl shadow-xl">
-      <h2 className="text-2xl font-bold text-center">Event Seating Chart</h2>
+    <div className="p-8 max-w-6xl mx-auto space-y-8 bg-white rounded-2xl shadow-xl">
+      <h2 className="text-2xl font-bold text-center">Admin Event Setup</h2>
 
-      {/* Event Name Input */}
+      {/* Event Name */}
       <div className="flex justify-center mt-4">
         <input
           type="text"
@@ -81,35 +133,58 @@ const handleCheckout = () => {
         />
       </div>
 
-      {/* Seat Selector */}
-      <div className="flex justify-center gap-4 mt-4">
-        <select
-          value={seatType}
-          onChange={(e) => setSeatType(e.target.value)}
-          className="border p-2 rounded-md"
-        >
-          <option value="Standard">Standard Seat (${seatPrices.Standard})</option>
-          <option value="VIP">VIP Seat (${seatPrices.VIP})</option>
-          <option value="Reserved">Reserved Seat (${seatPrices.Reserved})</option>
-        </select>
-      </div>
-
-      {/* Price Inputs */}
-      <div className="flex justify-center gap-6 mt-4">
+      {/* Seat Type Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
         {["Standard", "VIP", "Reserved"].map((type) => (
-          <div key={type} className="flex flex-col items-center">
-            <label className="font-medium">{type} Price</label>
+          <div
+            key={type}
+            className="border rounded-2xl shadow p-4 flex flex-col items-center space-y-3"
+          >
+            <h3 className="font-bold text-lg">{type} Seat</h3>
+
+            {seatImages[type] ? (
+              <img
+                src={seatImages[type]}
+                alt={`${type} preview`}
+                className="w-32 h-32 object-cover rounded-lg"
+              />
+            ) : (
+              <div className="w-32 h-32 bg-gray-200 flex items-center justify-center rounded-lg">
+                <span className="text-gray-500 text-sm">No Image</span>
+              </div>
+            )}
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(type, e.target.files[0])}
+              className="text-sm"
+            />
+
             <input
               type="number"
               value={seatPrices[type]}
               onChange={(e) => handlePriceChange(type, e.target.value)}
-              className="border p-1 rounded w-20 text-center"
+              className="border p-1 rounded w-24 text-center"
             />
           </div>
         ))}
       </div>
 
-      {/* Stage Label */}
+      {/* Seat Selector */}
+      <div className="flex justify-center gap-4 mt-6">
+        <select
+          value={seatType}
+          onChange={(e) => setSeatType(e.target.value)}
+          className="border p-2 rounded-md"
+        >
+          <option value="Standard">Standard (${seatPrices.Standard})</option>
+          <option value="VIP">VIP (${seatPrices.VIP})</option>
+          <option value="Reserved">Reserved (${seatPrices.Reserved})</option>
+        </select>
+      </div>
+
+      {/* Stage */}
       <div className="text-center font-semibold text-lg bg-black text-white py-2 rounded mt-6">
         Stage
       </div>
@@ -125,18 +200,23 @@ const handleCheckout = () => {
                 <button
                   key={seat.id}
                   onClick={() => toggleSeat(rowIndex, colIndex)}
-                  className={`w-8 h-8 rounded-full border-2 border-gray-400 flex items-center justify-center text-xs font-semibold ${
-                    seat.status === "selected"
-                      ? seat.type === "VIP"
-                        ? "bg-yellow-400"
-                        : seat.type === "Reserved"
-                        ? "bg-red-500"
-                        : "bg-blue-500"
-                      : "bg-gray-300 hover:bg-gray-400"
-                  } ${sectionBorder}`}
+                  className={`w-8 h-8 rounded-full border-2 border-gray-400 flex items-center justify-center text-xs font-semibold
+                    ${
+                      seat.status === "selected"
+                        ? seat.type === "VIP"
+                          ? "bg-yellow-400"
+                          : seat.type === "Reserved"
+                          ? "bg-red-500"
+                          : "bg-blue-500"
+                        : seat.status === "unavailable"
+                        ? "bg-gray-600 cursor-not-allowed"
+                        : "bg-gray-300 hover:bg-gray-400"
+                    } ${sectionBorder}`}
                   title={
                     seat.status === "selected"
                       ? `${seat.type} ($${seatPrices[seat.type]})`
+                      : seat.status === "unavailable"
+                      ? "Blocked"
                       : "Available"
                   }
                 >
@@ -148,52 +228,44 @@ const handleCheckout = () => {
         ))}
       </div>
 
-      {/* Legend */}
-      <div className="flex justify-center gap-6 mt-4 text-sm">
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full bg-gray-300 border border-gray-400" /> Available
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full bg-blue-500" /> Standard (${seatPrices.Standard})
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full bg-yellow-400" /> VIP (${seatPrices.VIP})
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-4 h-4 rounded-full bg-red-500" /> Reserved (${seatPrices.Reserved})
-        </div>
-      </div>
-
       {/* Pricing Summary */}
       <div className="mt-6 border-t pt-6 text-center space-y-2 text-lg">
         {selectedSeats.length > 0 && (
           <>
-            <p>
-              <strong>Selected Seats:</strong> {selectedSeats.length}
-            </p>
-            <p>
-              <strong>Subtotal:</strong> ${subtotal}
-            </p>
-            <p>
-              <strong>Service Fee (5%):</strong> ${serviceFee.toFixed(2)}
-            </p>
-            <p className="text-xl font-bold">
-              <strong>Total:</strong> ${total.toFixed(2)}
-            </p>
+            <p><strong>Selected Seats:</strong> {selectedSeats.length}</p>
+            <p><strong>Subtotal:</strong> ${subtotal}</p>
+            <p><strong>Service Fee (5%):</strong> ${serviceFee.toFixed(2)}</p>
+            <p className="text-xl font-bold"><strong>Total:</strong> ${total.toFixed(2)}</p>
           </>
         )}
 
-        <button
-          onClick={handleCheckout}
-          disabled={selectedSeats.length === 0}
-          className={`mt-4 px-6 py-3 font-semibold rounded-lg ${
-            selectedSeats.length === 0
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-600 text-white hover:bg-green-700"
-          }`}
-        >
-          Proceed to Checkout
-        </button>
+        <div className="flex justify-center gap-4 mt-4">
+          <button
+            onClick={handleCheckout}
+            disabled={selectedSeats.length === 0}
+            className={`px-6 py-3 font-semibold rounded-lg ${
+              selectedSeats.length === 0
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-green-600 text-white hover:bg-green-700"
+            }`}
+          >
+            Preview Tickets
+          </button>
+
+          <button
+            onClick={handleSaveEvent}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Save Event Setup
+          </button>
+
+          <button
+            onClick={handleReset}
+            className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >
+            Reset Event
+          </button>
+        </div>
       </div>
     </div>
   );

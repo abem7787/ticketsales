@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { UserPlus } from "lucide-react";
 import { Button } from "./button"; // your custom Button
 import { Link, useNavigate } from "react-router-dom";
-import Customerportal from "./CustomerPortal"
+// import Customerportal from "./CustomerPortal"
 
 export default function RegisterPage() {
   const navigate = useNavigate();
