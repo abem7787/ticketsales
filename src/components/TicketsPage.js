@@ -1,11 +1,14 @@
 // TicketsPage.js
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
+import PaymentModal from "../components/Paymentmodel";
 
 const TicketsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState(null);
 
   const tickets = location.state?.tickets || [];
   const subtotal = location.state?.subtotal || 0;
@@ -25,6 +28,13 @@ const TicketsPage = () => {
       </div>
     );
   }
+
+  const handleConfirmPayment = (method) => {
+    setPaymentMethod(method);
+    setShowPayment(false);
+    // You can add further logic here to process the payment
+    alert(`Payment method selected: ${method}`);
+  };
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -64,14 +74,20 @@ const TicketsPage = () => {
 
       <div className="text-center mt-6">
         <button
-          onClick={() =>
-            navigate("/paymentportal", { state: { tickets, subtotal, serviceFee, total } })
-          }
+          onClick={() => setShowPayment(true)}
           className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
         >
           Continue to Checkout
         </button>
       </div>
+
+      {showPayment && (
+        <PaymentModal
+          amount={total}
+          onClose={() => setShowPayment(false)}
+          onConfirm={handleConfirmPayment}
+        />
+      )}
     </div>
   );
 };
