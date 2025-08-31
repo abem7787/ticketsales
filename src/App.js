@@ -9,27 +9,28 @@ import AdminDash from "./components/AdminDash";
 import TicketsPage from "./components/TicketsPage";
 import CustomerPortal from "./components/CustomerPortal";
 import Login from "./components/Login";
+import PaymentModal from "./components/Paymentmodel";
 
 function App() {
   const [purchaseTickets, setPurchasedTickets] = useState([]);
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/sell-tickets" element={<SellTickets />} />
-      <Route path="/chart-seating" element={<SeatingChart />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/dashboard" element={<AdminDash />} />
-      <Route
-        path="/tickets"
-        element={<TicketsPage setPurchasedTickets={setPurchasedTickets} />}
-      />
-      <Route
-        path="/customer-portal"
-        element={<CustomerPortal tickets={purchaseTickets} />}
-      />
-    </Routes>
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/login" element={<Login />} />
+  <Route path="/sell-tickets" element={<SellTickets />} />
+  <Route path="/chart-seating" element={<SeatingChart />} />
+  <Route path="/signup" element={<SignUp />} />
+  <Route path="/dashboard" element={<AdminDash />} />
+  <Route
+    path="/tickets"
+    element={<TicketsPage setPurchasedTickets={setPurchasedTickets} />}
+  />
+  <Route
+    path="/customer-portal"
+    element={<CustomerPortal tickets={purchaseTickets} />}
+  />
+</Routes>
   );
 }
 
