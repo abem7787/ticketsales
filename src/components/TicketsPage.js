@@ -1,14 +1,11 @@
 // TicketsPage.js
-import React, { useState } from "react";
+import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
-import PaymentModal from "../components/Paymentmodel";
 
-const TicketsPage = () => {
+const TicketsPage = ({ setPurchasedTickets }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [showPayment, setShowPayment] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState(null);
 
   const tickets = location.state?.tickets || [];
   const subtotal = location.state?.subtotal || 0;
@@ -29,11 +26,14 @@ const TicketsPage = () => {
     );
   }
 
-  const handleConfirmPayment = (method) => {
-    setPaymentMethod(method);
-    setShowPayment(false);
-    // You can add further logic here to process the payment
-    alert(`Payment method selected: ${method}`);
+  const handleCheckout = () => {
+    // Save tickets for Customer Portal
+    setPurchasedTickets(tickets);
+
+    // Redirect to payment page with all data
+    navigate("/payment", {
+      state: { tickets, subtotal, serviceFee, total },
+    });
   };
 
   return (
@@ -47,7 +47,6 @@ const TicketsPage = () => {
             className="border p-4 rounded-lg shadow flex flex-col items-center space-y-3 bg-white"
           >
             <QRCodeSVG value={ticket.qrData} size={128} />
-
             {ticket.image && (
               <img
                 src={ticket.image}
@@ -55,7 +54,6 @@ const TicketsPage = () => {
                 className="w-32 h-32 object-cover rounded"
               />
             )}
-
             <div className="text-center">
               <p className="font-semibold text-lg">{ticket.seat}</p>
               <p className="text-gray-600">{ticket.type} Seat</p>
@@ -74,20 +72,12 @@ const TicketsPage = () => {
 
       <div className="text-center mt-6">
         <button
-          onClick={() => setShowPayment(true)}
+          onClick={handleCheckout}
           className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
         >
           Continue to Checkout
         </button>
       </div>
-
-      {showPayment && (
-        <PaymentModal
-          amount={total}
-          onClose={() => setShowPayment(false)}
-          onConfirm={handleConfirmPayment}
-        />
-      )}
     </div>
   );
 };

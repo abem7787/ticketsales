@@ -1,4 +1,3 @@
-// App.js
 import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./Home";
@@ -9,28 +8,29 @@ import AdminDash from "./components/AdminDash";
 import TicketsPage from "./components/TicketsPage";
 import CustomerPortal from "./components/CustomerPortal";
 import Login from "./components/Login";
-import PaymentModal from "./components/Paymentmodel";
+import PaymentPage from "./components/PaymentPage";
 
 function App() {
   const [purchaseTickets, setPurchasedTickets] = useState([]);
 
   return (
-<Routes>
-  <Route path="/" element={<Home />} />
-  <Route path="/login" element={<Login />} />
-  <Route path="/sell-tickets" element={<SellTickets />} />
-  <Route path="/chart-seating" element={<SeatingChart />} />
-  <Route path="/signup" element={<SignUp />} />
-  <Route path="/dashboard" element={<AdminDash />} />
-  <Route
-    path="/tickets"
-    element={<TicketsPage setPurchasedTickets={setPurchasedTickets} />}
-  />
-  <Route
-    path="/customer-portal"
-    element={<CustomerPortal tickets={purchaseTickets} />}
-  />
-</Routes>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/sell-tickets" element={<SellTickets />} />
+      <Route path="/chart-seating" element={<SeatingChart />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/dashboard" element={<AdminDash />} />
+      <Route
+        path="/tickets"
+        element={<TicketsPage setPurchasedTickets={setPurchasedTickets} />}
+      />
+      <Route
+        path="/customer-portal"
+        element={<CustomerPortal tickets={purchaseTickets} />}
+      />
+      <Route path="/payment" element={<PaymentPage />} />
+    </Routes>
   );
 }
 
