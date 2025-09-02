@@ -1,35 +1,111 @@
-// CustomerPortalPage.js
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const CustomerPortalPage = ({ tickets }) => {
+const CustomerPortalPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { tickets = [] } = location.state || {};
+
+  const [flyer, setFlyer] = useState(null); // State for uploaded flyer/logo
+
+  // Group tickets by type and count quantity
+  const groupedTickets = tickets.reduce((acc, ticket) => {
+    if (!acc[ticket.type]) acc[ticket.type] = { ...ticket, quantity: 0 };
+    acc[ticket.type].quantity += 1;
+    return acc;
+  }, {});
+  const ticketGroups = Object.values(groupedTickets);
+
+  // Generate confirmation number
+  const confirmationNumber = useMemo(() => {
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    return `CONF-${date}-${random}`;
+  }, []);
+
+  // Handle flyer/logo upload
+  const handleFlyerUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFlyer(reader.result);
+        // Transfer flyer to EventList
+        const updatedEvents = tickets.map((ticket) => ({
+          ...ticket,
+          flyer: reader.result,
+        }));
+        navigate("/event-list", { state: { events: updatedEvents } });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <h2 className="text-2xl font-bold text-center mb-6">
-        Your Purchased Tickets
-      </h2>
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold">✅ Your Purchased Tickets – Payment Confirmed</h2>
+          <p className="text-gray-600 mt-1">
+            Confirmation Number: <span className="font-mono">{confirmationNumber}</span>
+          </p>
+        </div>
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Go to Dashboard
+        </button>
+      </div>
 
+      {/* Flyer Upload */}
+      <div className="mb-6 text-center">
+        <label className="block mb-2 font-semibold">Upload Flyer / Logo</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFlyerUpload}
+          className="border p-2 rounded"
+        />
+      </div>
+
+      {/* Tickets */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {tickets.map((ticket) => (
+        {ticketGroups.map((ticket) => (
           <div
-            key={ticket.id}
+            key={ticket.type}
             className="border rounded-2xl shadow-md overflow-hidden bg-white flex flex-col items-center p-4"
           >
-            {/* Image at the top */}
-            <img
-              src={ticket.image}
-              alt={`${ticket.type} Seat`}
-              className="w-full h-40 object-cover rounded-lg mb-4"
-            />
+            {/* Ticket Image */}
+            {ticket.image && (
+              <img
+                src={ticket.image}
+                alt={`${ticket.type} Seat`}
+                className="w-32 h-32 object-cover rounded-lg mb-4"
+              />
+            )}
 
-            {/* Ticket details */}
-            <h3 className="font-bold text-lg mb-2">{ticket.type} Seat</h3>
-            <p className="mb-3 text-gray-600">Price: ${ticket.price}</p>
+            <h3 className="font-bold text-lg mb-1">{ticket.type} Seat</h3>
+            <p className="text-gray-600 mb-1">Price: ${ticket.price}</p>
+            <p className="text-gray-600 mb-3">Quantity: {ticket.quantity}</p>
+
+            {/* Display uploaded flyer/logo above QR code */}
+            {flyer && (
+              <div className="mb-3 flex justify-center">
+                <img
+                  src={flyer}
+                  alt="Event Logo"
+                  className="w-24 h-24 object-contain rounded-md mb-2"
+                />
+              </div>
+            )}
 
             {/* QR Code */}
             <div className="p-2 bg-gray-100 rounded-lg">
               <QRCodeSVG
-                value={`Ticket-${ticket.id}-${ticket.type}`}
+                value={`Ticket-${ticket.type}-Qty${ticket.quantity}-CONF${confirmationNumber}`}
                 size={128}
               />
             </div>

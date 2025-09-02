@@ -1,72 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const EventList = () => {
-  const [events, setEvents] = useState([]);
+const EventList = ({ events }) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Fetching events from API (mocked as an array of events here)
-    const fetchEvents = () => {
-      const eventsData = [
-        {
-          id: 1,
-          artist: 'John Doe',
-          photo: 'https://via.placeholder.com/150',
-          eventName: 'Art Exhibition',
-          price: 50.00,
-        },
-        {
-          id: 2,
-          artist: 'Jane Smith',
-          photo: 'https://via.placeholder.com/150',
-          eventName: 'Painting Show',
-          price: 75.00,
-        },
-        {
-          id: 3,
-          artist: 'Bob Johnson',
-          photo: 'https://via.placeholder.com/150',
-          eventName: 'Sculpture Display',
-          price: 60.00,
-        }
-      ];
-      setEvents(eventsData);
-    };
-
-    fetchEvents();
-  }, []);
-
-  const handleEventSelection = (eventId) => {
-    // Navigate to the purchase page with eventId
-    navigate(`/purchase/${eventId}`);
+  const handleBuyTickets = (event) => {
+    navigate("/customer-portal", { state: { tickets: [event] } });
   };
 
+  if (!events || events.length === 0) {
+    return <p className="text-center mt-8">No events available at the moment.</p>;
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 flex justify-center items-center">
-      <div className="bg-slate-700 p-8 rounded-xl shadow-lg w-full max-w-2xl">
-        <h2 className="text-2xl font-semibold mb-6">Available Events</h2>
-        <div className="space-y-6">
-          {events.map((event) => (
-            <div key={event.id} className="bg-slate-600 p-4 rounded-lg flex items-center justify-between">
-              <div className="flex items-center">
-                <img src={event.photo} alt={event.artist} className="w-24 h-24 object-cover rounded-md" />
-                <div className="ml-4">
-                  <h3 className="text-xl">{event.eventName}</h3>
-                  <p className="text-sm text-gray-300">Artist: {event.artist}</p>
-                  <p className="text-lg text-indigo-500">${event.price}</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => handleEventSelection(event.id)}
-                className="py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
-              >
-                Select Event
-              </button>
-            </div>
-          ))}
+    <div className="p-8 max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold text-center mb-6">Events</h2>
+      {events.map((event) => (
+        <div key={event.id} className="mb-8 p-4 border rounded-xl shadow-lg text-center">
+          <h3 className="text-lg font-semibold mb-2">{event.name}</h3>
+
+          {/* Display the uploaded flyer */}
+          {event.flyer && (
+            <img
+              src={event.flyer}
+              alt={`${event.name} Flyer`}
+              className="w-32 h-32 object-contain rounded-md mx-auto mb-2"
+            />
+          )}
+
+          <p className="mb-2 font-medium">{event.type} Ticket - ${event.price}</p>
+          <button
+            onClick={() => handleBuyTickets(event)}
+            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Buy Ticket
+          </button>
         </div>
-      </div>
+      ))}
     </div>
   );
 };
