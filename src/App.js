@@ -25,7 +25,7 @@ function App() {
       <Route path="/tickets" element={<TicketsPage setPurchasedTickets={setPurchasedTickets} />} />
       <Route path="/customer-portal" element={<CustomerPortalPage />} />
       <Route path="/payment" element={<PaymentPage />} />
-      <Route path="/event" element={<EventList />} />
+      <Route path="/events" element={<EventList />} />
       <Route path="/customer-portal" element={<CustomerPortalPage />} />
 
     </Routes>

@@ -7,9 +7,10 @@ const CustomerPortalPage = () => {
   const navigate = useNavigate();
   const { tickets = [] } = location.state || {};
 
-  const [flyer, setFlyer] = useState(null); // State for uploaded flyer/logo
+  const [flyer, setFlyer] = useState(null); // uploaded flyer
+  const [uploadedFileName, setUploadedFileName] = useState(""); // optional display of filename
 
-  // Group tickets by type and count quantity
+  // Group tickets by type
   const groupedTickets = tickets.reduce((acc, ticket) => {
     if (!acc[ticket.type]) acc[ticket.type] = { ...ticket, quantity: 0 };
     acc[ticket.type].quantity += 1;
@@ -31,15 +32,19 @@ const CustomerPortalPage = () => {
       const reader = new FileReader();
       reader.onload = () => {
         setFlyer(reader.result);
-        // Transfer flyer to EventList
-        const updatedEvents = tickets.map((ticket) => ({
-          ...ticket,
-          flyer: reader.result,
-        }));
-        navigate("/event-list", { state: { events: updatedEvents } });
+        setUploadedFileName(file.name);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  // Confirm button sends flyer + tickets to EventList
+  const handleConfirm = () => {
+    const updatedEvents = tickets.map((ticket) => ({
+      ...ticket,
+      flyer: flyer || ticket.flyer, // keep existing flyer if none uploaded
+    }));
+    navigate("/event-list", { state: { events: updatedEvents } });
   };
 
   return (
@@ -69,6 +74,14 @@ const CustomerPortalPage = () => {
           onChange={handleFlyerUpload}
           className="border p-2 rounded"
         />
+        {uploadedFileName && <p className="mt-2 text-gray-600">Selected file: {uploadedFileName}</p>}
+        <button
+          onClick={handleConfirm}
+          disabled={!flyer}
+          className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400"
+        >
+          Confirm & Send to Event List
+        </button>
       </div>
 
       {/* Tickets */}
@@ -78,7 +91,6 @@ const CustomerPortalPage = () => {
             key={ticket.type}
             className="border rounded-2xl shadow-md overflow-hidden bg-white flex flex-col items-center p-4"
           >
-            {/* Ticket Image */}
             {ticket.image && (
               <img
                 src={ticket.image}
@@ -91,7 +103,6 @@ const CustomerPortalPage = () => {
             <p className="text-gray-600 mb-1">Price: ${ticket.price}</p>
             <p className="text-gray-600 mb-3">Quantity: {ticket.quantity}</p>
 
-            {/* Display uploaded flyer/logo above QR code */}
             {flyer && (
               <div className="mb-3 flex justify-center">
                 <img
@@ -102,7 +113,6 @@ const CustomerPortalPage = () => {
               </div>
             )}
 
-            {/* QR Code */}
             <div className="p-2 bg-gray-100 rounded-lg">
               <QRCodeSVG
                 value={`Ticket-${ticket.type}-Qty${ticket.quantity}-CONF${confirmationNumber}`}

@@ -151,45 +151,52 @@ export default function Home() {
     const lower = item.toLowerCase();
 
     return (
-      <motion.li
-        key={item}
-        className="w-full md:w-auto"
-        whileHover={{
-          y: -2,
-          transition: { type: "spring", stiffness: 100, damping: 10 },
-        }}
-        transition={{ type: "spring", stiffness: 200 }}
-      >
-        {lower === "sell tickets" ? (
-          <Link
-            to="/sell-tickets"
-            className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
-          >
-            {item.toUpperCase()}
-          </Link>
-        ) : lower === "login" ? (
-          <Link
-            to="/login"
-            className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
-          >
-            {item.toUpperCase()}
-          </Link>
-        ) : lower === "sign up" ? (
-          <Link
-            to="/signup"
-            className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
-          >
-            {item.toUpperCase()}
-          </Link>
-        ) : (
-          <a
-            href={`#${lower.replace(" ", "-")}`}
-            className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
-          >
-            {item.toUpperCase()}
-          </a>
-        )}
-      </motion.li>
+       <motion.li
+      key={item}
+      className="w-full md:w-auto"
+      whileHover={{
+        y: -2,
+        transition: { type: "spring", stiffness: 100, damping: 10 },
+      }}
+      transition={{ type: "spring", stiffness: 200 }}
+    >
+      {lower === "events" ? (
+        <Link
+          to="/events"
+          className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
+        >
+          {item.toUpperCase()}
+        </Link>
+      ) : lower === "sell tickets" ? (
+        <Link
+          to="/sell-tickets"
+          className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
+        >
+          {item.toUpperCase()}
+        </Link>
+      ) : lower === "login" ? (
+        <Link
+          to="/login"
+          className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
+        >
+          {item.toUpperCase()}
+        </Link>
+      ) : lower === "sign up" ? (
+        <Link
+          to="/signup"
+          className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
+        >
+          {item.toUpperCase()}
+        </Link>
+      ) : (
+        <a
+          href={`#${lower.replace(" ", "-")}`}
+          className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
+        >
+          {item.toUpperCase()}
+        </a>
+      )}
+    </motion.li>
     );
   })}
 </motion.ul>
