@@ -7,8 +7,8 @@ const CustomerPortalPage = () => {
   const navigate = useNavigate();
   const { tickets = [] } = location.state || {};
 
-  const [flyer, setFlyer] = useState(null); // uploaded flyer
-  const [uploadedFileName, setUploadedFileName] = useState(""); // optional display of filename
+  const [flyer, setFlyer] = useState(null);
+  const [uploadedFileName, setUploadedFileName] = useState("");
 
   // Group tickets by type
   const groupedTickets = tickets.reduce((acc, ticket) => {
@@ -25,7 +25,7 @@ const CustomerPortalPage = () => {
     return `CONF-${date}-${random}`;
   }, []);
 
-  // Handle flyer/logo upload
+  // Handle flyer upload
   const handleFlyerUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -40,11 +40,12 @@ const CustomerPortalPage = () => {
 
   // Confirm button sends flyer + tickets to EventList
   const handleConfirm = () => {
-    const updatedEvents = tickets.map((ticket) => ({
-      ...ticket,
-      flyer: flyer || ticket.flyer, // keep existing flyer if none uploaded
-    }));
-    navigate("/event-list", { state: { events: updatedEvents } });
+    navigate("/event-list", {
+      state: {
+        events: ticketGroups,
+        flyer, // 👈 send flyer once as category-level image
+      },
+    });
   };
 
   return (
@@ -52,9 +53,12 @@ const CustomerPortalPage = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold">✅ Your Purchased Tickets – Payment Confirmed</h2>
+          <h2 className="text-2xl font-bold">
+            ✅ Your Purchased Tickets – Payment Confirmed
+          </h2>
           <p className="text-gray-600 mt-1">
-            Confirmation Number: <span className="font-mono">{confirmationNumber}</span>
+            Confirmation Number:{" "}
+            <span className="font-mono">{confirmationNumber}</span>
           </p>
         </div>
         <button
@@ -74,7 +78,21 @@ const CustomerPortalPage = () => {
           onChange={handleFlyerUpload}
           className="border p-2 rounded"
         />
-        {uploadedFileName && <p className="mt-2 text-gray-600">Selected file: {uploadedFileName}</p>}
+        {uploadedFileName && (
+          <p className="mt-2 text-gray-600">Selected file: {uploadedFileName}</p>
+        )}
+
+        {/* Show flyer preview above cards */}
+        {flyer && (
+          <div className="mt-4 flex justify-center">
+            <img
+              src={flyer}
+              alt="Event Flyer"
+              className="w-48 h-48 object-contain rounded-lg shadow-md"
+            />
+          </div>
+        )}
+
         <button
           onClick={handleConfirm}
           disabled={!flyer}
@@ -84,7 +102,7 @@ const CustomerPortalPage = () => {
         </button>
       </div>
 
-      {/* Tickets */}
+      {/* Ticket Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {ticketGroups.map((ticket) => (
           <div
@@ -102,16 +120,6 @@ const CustomerPortalPage = () => {
             <h3 className="font-bold text-lg mb-1">{ticket.type} Seat</h3>
             <p className="text-gray-600 mb-1">Price: ${ticket.price}</p>
             <p className="text-gray-600 mb-3">Quantity: {ticket.quantity}</p>
-
-            {flyer && (
-              <div className="mb-3 flex justify-center">
-                <img
-                  src={flyer}
-                  alt="Event Logo"
-                  className="w-24 h-24 object-contain rounded-md mb-2"
-                />
-              </div>
-            )}
 
             <div className="p-2 bg-gray-100 rounded-lg">
               <QRCodeSVG
