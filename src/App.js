@@ -10,9 +10,13 @@ import CustomerPortalPage from "./components/CustomerPortal";
 import Login from "./components/Login";
 import PaymentPage from "./components/PaymentPage";
 import EventList from "./components/EventList";
+import CustomerEventList from "./components/CustomerEventList"; 
+import CustomerSeatSelection from "./components/CustomerSeatSelection;";
+
 
 function App() {
-  const [purchaseTickets, setPurchasedTickets] = useState([]);
+  const [purchasedTickets, setPurchasedTickets] = useState([]); // updated state name
+  const [events, setEvents] = useState([]); // Store events globally
 
   return (
     <Routes>
@@ -21,13 +25,20 @@ function App() {
       <Route path="/sell-tickets" element={<SellTickets />} />
       <Route path="/chart-seating" element={<SeatingChart />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/dashboard" element={<AdminDash />} />
-      <Route path="/tickets" element={<TicketsPage setPurchasedTickets={setPurchasedTickets} />} />
-      <Route path="/customer-portal" element={<CustomerPortalPage />} />
+      <Route path="/dashboard" element={<AdminDash setEvents={setEvents} />} />
+     <Route path="/customer-seat-selection" element={<CustomerSeatSelection setEvents={setEvents} />} />
+      <Route
+        path="/tickets"
+        element={<TicketsPage setPurchasedTickets={setPurchasedTickets} />}
+      />
+         <Route path="/customer-event-list" element={<CustomerEventList events={events} />} /> {/* customer view */}
+    
+      <Route path="/event-list" element={<EventList events={events} />} />
+      <Route
+        path="/customer-portal"
+        element={<CustomerPortalPage purchasedTickets={purchasedTickets} />}
+      />
       <Route path="/payment" element={<PaymentPage />} />
-      <Route path="/events" element={<EventList />} />
-      <Route path="/customer-portal" element={<CustomerPortalPage />} />
-
     </Routes>
   );
 }
