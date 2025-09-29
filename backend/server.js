@@ -10,6 +10,7 @@ app.use(cookieParser());
 
 // Allow requests from React frontend
 const allowedOrigins = [
+ "http://localhost:3000", // 👈 add this
   "http://localhost:3002",
   "http://localhost:3003",
   "http://10.5.0.2:3002"
