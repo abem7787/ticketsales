@@ -1,41 +1,28 @@
-import React, { useState } from 'react';
-import { Box, Typography, Button } from '@material-ui/core';
+import React from "react";
 
-const SeatMap = ({ venueLayout, onSeatSelect }) => {
-  const [selectedSeats, setSelectedSeats] = useState([]);
-
-  const handleSeatClick = (seat) => {
-    // Toggle seat selection logic
-  };
-
+const SeatMap = ({ seats, selectedSeats, onSeatClick }) => {
   return (
-    <Box className="seat-map">
-      <Typography variant="h6">Select Your Seats</Typography>
-      <div className="stage">Stage</div>
-      <div className="seats-grid">
-        {venueLayout.map((row, rowIndex) => (
-          <div key={rowIndex} className="seat-row">
-            {row.map((seat, seatIndex) => (
-              <button
-                key={seatIndex}
-                className={`seat ${seat.status} ${selectedSeats.includes(seat.id) ? 'selected' : ''}`}
-                onClick={() => handleSeatClick(seat)}
-                disabled={seat.status === 'unavailable'}
-              >
-                {seat.label}
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
-      <Button 
-        variant="contained" 
-        color="primary"
-        onClick={() => onSeatSelect(selectedSeats)}
-      >
-        Confirm Seats
-      </Button>
-    </Box>
+    <div className="grid grid-cols-8 gap-2 mb-6">
+      {seats.map((seat) => {
+        const isSelected = selectedSeats.some((s) => s.id === seat.id);
+        return (
+          <button
+            key={seat.id}
+            onClick={() => onSeatClick(seat)}
+            disabled={!seat.available}
+            className={`w-10 h-10 rounded-md ${
+              !seat.available
+                ? "bg-gray-400 cursor-not-allowed"
+                : isSelected
+                ? "bg-green-500 text-white"
+                : "bg-blue-500 text-white hover:bg-blue-600"
+            }`}
+          >
+            {seat.id} - ${seat.price}
+          </button>
+        );
+      })}
+    </div>
   );
 };
 

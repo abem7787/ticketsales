@@ -17,19 +17,19 @@ const AdminDashboard = () => {
             </Link>
           </li>
           <li className="mb-6">
-            <Link to="/admin/reward-points" className="flex items-center space-x-3">
+            <Link to="/reward-points" className="flex items-center space-x-3">
               <FaGift className="text-xl" />
               <span>Reward Points</span>
             </Link>
           </li>
           <li className="mb-6">
-            <Link to="/admin/promo-codes" className="flex items-center space-x-3">
+            <Link to="/promo-codes" className="flex items-center space-x-3">
               <FaTicketAlt className="text-xl" />
               <span>Promo Codes</span>
             </Link>
           </li>
           <li className="mb-6">
-            <Link to="/admin/refunds" className="flex items-center space-x-3">
+            <Link to="/refunds" className="flex items-center space-x-3">
               <FaUserShield className="text-xl" />
               <span>Refunds</span>
             </Link>
