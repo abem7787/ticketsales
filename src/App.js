@@ -10,6 +10,7 @@ import CustomerPortalPage from "./components/CustomerPortal";
 import Login from "./components/Login";
 import PaymentPage from "./components/PaymentPage";
 import SeatSelection from "./components/SeatSelection";
+import EventList from "./components/EventList"; // ✅ Import EventList
 
 function App() {
   const [events, setEvents] = useState([
@@ -46,6 +47,9 @@ function App() {
       <Route path="/chart-seating" element={<SeatingChart />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/dashboard" element={<AdminDash setEvents={setEvents} />} />
+      
+      {/* Event List page */}
+      <Route path="/event-list" element={<EventList events={events} />} />
 
       {/* Seat selection route */}
       <Route
