@@ -1,31 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import SeatMap from "./SeatMap";
+import SeatMap from "./SeatMap"; // your existing seat map component
 
-const CustomerSeatSelection = () => {
+const EventSeatSelection = () => {
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
-  const [isDragging, setIsDragging] = useState(false);
 
-  // Load event from localStorage
+  // Load the selected event from localStorage
   useEffect(() => {
     const savedEvent = localStorage.getItem("eventConfig");
-    if (savedEvent) setEvent(JSON.parse(savedEvent));
-  }, []);
-
-  // Stop dragging if mouse released anywhere
-  useEffect(() => {
-    const stopDragging = () => setIsDragging(false);
-    window.addEventListener("mouseup", stopDragging);
-    return () => window.removeEventListener("mouseup", stopDragging);
+    if (savedEvent) {
+      setEvent(JSON.parse(savedEvent));
+    }
   }, []);
 
   if (!event) {
     return <p className="text-center mt-8 text-gray-500">No event available.</p>;
   }
 
-  const toggleSeat = (seat) => {
+  const handleSeatClick = (seat) => {
     if (seat.status !== "available") return;
 
     setSelectedSeats((prev) =>
@@ -35,17 +29,9 @@ const CustomerSeatSelection = () => {
     );
   };
 
-  const handleSeatMouseDown = (seat) => {
-    setIsDragging(true);
-    toggleSeat(seat);
-  };
-
-  const handleSeatMouseOver = (seat) => {
-    if (isDragging) toggleSeat(seat);
-  };
-
+  // Calculate total price
   const totalPrice = selectedSeats.reduce(
-    (sum, seat) => sum + event.seatPrices[seat.type],
+    (sum, seat) => sum + (event.seats.find((s) => s.id === seat.id)?.price || 0),
     0
   );
 
@@ -60,16 +46,12 @@ const CustomerSeatSelection = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6 flex justify-center items-center">
       <div className="bg-gray-800 p-8 rounded-xl shadow-lg max-w-xl w-full">
-        <h2 className="text-2xl font-semibold mb-6">
-          {event.eventName} - Select Seats
-        </h2>
+        <h2 className="text-2xl font-semibold mb-6">{event.name} - Select Seats</h2>
 
-        {/* SeatMap with drag support */}
         <SeatMap
-          seats={event.seats.flat()} // flatten if nested
+          seats={event.seats} // Pass all seats
           selectedSeats={selectedSeats}
-          onSeatMouseDown={handleSeatMouseDown}
-          onSeatMouseOver={handleSeatMouseOver}
+          onSeatClick={handleSeatClick}
         />
 
         <div className="mb-4">
@@ -89,4 +71,4 @@ const CustomerSeatSelection = () => {
   );
 };
 
-export default CustomerSeatSelection;
+export default EventSeatSelection;

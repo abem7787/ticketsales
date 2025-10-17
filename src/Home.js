@@ -162,7 +162,7 @@ export default function Home() {
     >
       {lower === "events" ? (
         <Link
-          to="/events"
+          to="/event-list"
           className="text-base font-medium tracking-wider hover:text-yellow-400 transition-colors duration-700"
         >
           {item.toUpperCase()}
