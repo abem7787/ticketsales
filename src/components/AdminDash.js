@@ -56,7 +56,7 @@ const AdminDashboard = () => {
           </li>
           <li className="mb-6">
             <Link
-              to="/reward-points"
+              to="/points"
               className="flex items-center space-x-3 hover:text-slate-300"
               onClick={() => setMenuOpen(false)}
             >

@@ -7,8 +7,8 @@ const CustomerPortalPage = ({ events = [], setEvents }) => {
   const [flyer, setFlyer] = useState(null);
   const [uploadedFileName, setUploadedFileName] = useState("");
   const [eventName, setEventName] = useState("");
-  const [seatCount, setSeatCount] = useState(10); // default seats
-  const [seatPrice, setSeatPrice] = useState(50); // default price
+  const [seatCount, setSeatCount] = useState("");
+  const [seatPrice, setSeatPrice] = useState("");
 
   const confirmationNumber = useMemo(() => {
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -28,16 +28,15 @@ const CustomerPortalPage = ({ events = [], setEvents }) => {
   };
 
   const handleConfirm = () => {
-    if (!flyer || !eventName) {
-      alert("Please enter an event name and upload a flyer.");
+    if (!flyer || !eventName || !seatCount || !seatPrice) {
+      alert("Please enter all event details and upload a flyer.");
       return;
     }
 
-    // Generate seats
-    const seats = Array.from({ length: seatCount }, (_, i) => ({
+    const seats = Array.from({ length: Number(seatCount) }, (_, i) => ({
       id: i + 1,
       type: "Standard",
-      price: seatPrice,
+      price: Number(seatPrice),
       available: true,
     }));
 
@@ -73,7 +72,7 @@ const CustomerPortalPage = ({ events = [], setEvents }) => {
           type="number"
           placeholder="Number of Seats"
           value={seatCount}
-          onChange={(e) => setSeatCount(Number(e.target.value))}
+          onChange={(e) => setSeatCount(e.target.value)}
           className="mb-4 p-2 w-full rounded-md text-black"
         />
 
@@ -81,13 +80,19 @@ const CustomerPortalPage = ({ events = [], setEvents }) => {
           type="number"
           placeholder="Price per Seat"
           value={seatPrice}
-          onChange={(e) => setSeatPrice(Number(e.target.value))}
+          onChange={(e) => setSeatPrice(e.target.value)}
           className="mb-4 p-2 w-full rounded-md text-black"
         />
 
         <input type="file" accept="image/*" onChange={handleFlyerUpload} className="mb-4" />
         {uploadedFileName && <p className="text-green-400 mb-4">Uploaded: {uploadedFileName}</p>}
-        {flyer && <img src={flyer} alt="Flyer Preview" className="w-40 h-40 object-cover mx-auto rounded-lg mb-6" />}
+        {flyer && (
+          <img
+            src={flyer}
+            alt="Flyer Preview"
+            className="w-40 h-40 object-cover mx-auto rounded-lg mb-6"
+          />
+        )}
 
         <button
           onClick={handleConfirm}

@@ -10,7 +10,9 @@ import CustomerPortalPage from "./components/CustomerPortal";
 import Login from "./components/Login";
 import PaymentPage from "./components/PaymentPage";
 import SeatSelection from "./components/SeatSelection";
-import EventList from "./components/EventList"; // ✅ Import EventList
+import EventList from "./components/EventList";
+import PaymentForm from "./components/PaymentForm";
+import RewardPointsPage from "./components/RewardPoints"; // ✅ Reward Points Page
 
 function App() {
   const [events, setEvents] = useState([
@@ -41,21 +43,24 @@ function App() {
 
   return (
     <Routes>
+      {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/sell-tickets" element={<SellTickets />} />
-      <Route path="/chart-seating" element={<SeatingChart />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route path="/dashboard" element={<AdminDash setEvents={setEvents} />} />
-      
-      {/* Event List page */}
       <Route path="/event-list" element={<EventList events={events} />} />
-
-      {/* Seat selection route */}
       <Route
         path="/seat-selection/:id"
         element={<SeatSelection events={events} setEvents={setEvents} />}
       />
+      <Route
+        path="/tickets"
+        element={<TicketsPage setPurchasedTickets={setPurchasedTickets} />}
+      />
+      <Route path="/payment" element={<PaymentPage />} />
+      <Route path="/paymentForm" element={<PaymentForm />} />
+
+      {/* ✅ Reward Points Route */}
+      <Route path="/reward-points" element={<RewardPointsPage />} />
 
       <Route
         path="/customer-portal"
@@ -68,14 +73,16 @@ function App() {
         }
       />
 
-      <Route
-        path="/tickets"
-        element={<TicketsPage setPurchasedTickets={setPurchasedTickets} />}
-      />
+      {/* Admin Routes */}
+      <Route path="/sell-tickets" element={<SellTickets />} />
+      <Route path="/chart-seating" element={<SeatingChart />} /> {/* ✅ Chart Seating */}
+      <Route path="/dashboard" element={<AdminDash setEvents={setEvents} />} />
 
-      <Route path="/payment" element={<PaymentPage />} />
+      {/* ✅ Alternate Routes */}
+      <Route path="/seating-chart" element={<SeatingChart />} />
+      <Route path="/points" element={<RewardPointsPage />} />
 
-      {/* Redirect any unknown path to home */}
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

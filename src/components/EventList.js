@@ -20,15 +20,30 @@ const EventList = ({ events: propEvents = [] }) => {
 
   if (!events.length) {
     return (
-      <p className="text-center mt-8 text-gray-500">
-        No events available.
-      </p>
+      <div className="text-center mt-8">
+        <p className="text-gray-500 mb-4">No events available.</p>
+        <button
+          onClick={() => navigate("/")}
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
+        >
+          Back to Home
+        </button>
+      </div>
     );
   }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <h2 className="text-3xl font-bold text-center mb-6">Events</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-center flex-1">Events</h2>
+        <button
+          onClick={() => navigate("/")}
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
+        >
+          Back to Home
+        </button>
+      </div>
+
       <div className="flex flex-wrap gap-4 justify-center">
         {events.map((event, idx) => {
           const seatCount = event.seats?.length || 0;
