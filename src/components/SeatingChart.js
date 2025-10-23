@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Configuration
 const serviceFeePercentage = 0.05;
 
 const seatPatterns = {
@@ -12,17 +11,14 @@ const seatPatterns = {
 
 const initialSeatPrices = { Standard: 50, VIP: 200, Reserved: 500 };
 
-// Create seat grid helper
 const createSeats = (rows, cols) => {
-  const seats = [];
-  for (let r = 0; r < rows; r++) {
-    const row = [];
-    for (let c = 0; c < cols; c++) {
-      row.push({ id: `${r}-${c}`, status: "available", type: null });
-    }
-    seats.push(row);
-  }
-  return seats;
+  return Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => ({
+      id: `${r}-${c}`,
+      status: "available",
+      type: null,
+    }))
+  );
 };
 
 const SeatingChart = () => {
@@ -34,23 +30,19 @@ const SeatingChart = () => {
   const [eventName, setEventName] = useState("Demo Event");
   const [isDragging, setIsDragging] = useState(false);
 
-  // ✅ UseMemo prevents re-creating seats on every render
   const initialSeats = useMemo(() => createSeats(6, 12), []);
   const [seats, setSeats] = useState(initialSeats);
 
-  // Stop drag globally
   useEffect(() => {
     const stopDragging = () => setIsDragging(false);
     window.addEventListener("mouseup", stopDragging);
     return () => window.removeEventListener("mouseup", stopDragging);
   }, []);
 
-  // Handle seat toggle (safe copy)
   const toggleSeat = (rowIndex, colIndex) => {
-    setSeats((prevSeats) => {
-      const updated = prevSeats.map((row) => [...row]);
+    setSeats(prevSeats => {
+      const updated = prevSeats.map(row => [...row]);
       const seat = updated[rowIndex][colIndex];
-
       if (seat.status === "available") {
         seat.status = "selected";
         seat.type = seatType;
@@ -58,7 +50,6 @@ const SeatingChart = () => {
         seat.status = "available";
         seat.type = null;
       }
-
       return updated;
     });
   };
@@ -72,37 +63,32 @@ const SeatingChart = () => {
     if (isDragging) toggleSeat(rowIndex, colIndex);
   };
 
-  const selectedSeats = seats.flat().filter((seat) => seat.status === "selected");
+  const selectedSeats = seats.flat().filter(seat => seat.status === "selected");
   const subtotal = selectedSeats.reduce((sum, seat) => sum + seatPrices[seat.type], 0);
   const serviceFee = subtotal * serviceFeePercentage;
   const total = subtotal + serviceFee;
 
-  // Change seat layout
-  const handlePatternChange = (newPattern) => {
+  const handlePatternChange = newPattern => {
     setPatternName(newPattern);
     const { rows, cols } = seatPatterns[newPattern];
     setSeats(createSeats(rows, cols));
   };
 
-  // Save current event setup
   const handleSaveEvent = () => {
-    const eventConfig = { eventName, seatPrices, seats, patternName };
-    localStorage.setItem("eventConfig", JSON.stringify(eventConfig));
+    localStorage.setItem("eventConfig", JSON.stringify({ eventName, seatPrices, seats, patternName }));
     alert("✅ Event saved successfully!");
   };
 
-  // Reset layout
   const handleReset = () => {
     const { rows, cols } = seatPatterns[patternName];
     setSeats(createSeats(rows, cols));
     alert("🔄 Event reset complete!");
   };
 
-  // Checkout / preview selected tickets
   const handleCheckout = () => {
     if (!selectedSeats.length) return;
 
-    const tickets = selectedSeats.map((seat) => {
+    const tickets = selectedSeats.map(seat => {
       const [rowIndex, colIndex] = seat.id.split("-").map(Number);
       const seatLabel = `${String.fromCharCode(65 + rowIndex)}${colIndex + 1}`;
       const ticketId = `${seat.id}-${Date.now()}`;
@@ -125,65 +111,59 @@ const SeatingChart = () => {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-8 bg-white rounded-2xl shadow-xl">
-      <h2 className="text-2xl font-bold text-center">
-        {eventName} - Admin Seating
-      </h2>
+    <div className="p-8 max-w-7xl mx-auto bg-gray-50 rounded-3xl shadow-2xl space-y-8">
+      <h2 className="text-3xl font-bold text-center text-gray-800">{eventName} - Admin Seating</h2>
 
-      {/* Event Name Input */}
+      {/* Event Input */}
       <div className="flex justify-center mt-4">
         <input
           type="text"
           value={eventName}
-          onChange={(e) => setEventName(e.target.value)}
+          onChange={e => setEventName(e.target.value)}
           placeholder="Enter Event Name"
-          className="border p-2 rounded-md w-80 text-center"
+          className="border border-gray-300 p-3 rounded-xl w-80 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         />
       </div>
 
-      {/* Pattern Selection */}
-      <div className="flex justify-center mt-4 gap-4">
-        {Object.keys(seatPatterns).map((pattern) => (
+      {/* Layout Selection */}
+      <div className="flex justify-center mt-6 gap-4 flex-wrap">
+        {Object.keys(seatPatterns).map(pattern => (
           <button
             key={pattern}
-            className={`px-4 py-2 rounded ${
-              patternName === pattern
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
             onClick={() => handlePatternChange(pattern)}
+            className={`px-5 py-2 rounded-xl font-medium transition-colors ${
+              patternName === pattern ? "bg-blue-600 text-white shadow-lg" : "bg-gray-200 hover:bg-gray-300"
+            }`}
           >
             {pattern}
           </button>
         ))}
       </div>
 
-      {/* Seat Type Buttons */}
-      <div className="flex justify-center mt-4 gap-4">
-        {["Standard", "VIP", "Reserved"].map((type) => (
+      {/* Seat Type Selection */}
+      <div className="flex justify-center mt-4 gap-4 flex-wrap">
+        {["Standard", "VIP", "Reserved"].map(type => (
           <button
             key={type}
-            className={`px-4 py-2 rounded ${
-              seatType === type
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
             onClick={() => setSeatType(type)}
+            className={`px-5 py-2 rounded-xl font-medium transition transform ${
+              seatType === type ? "bg-blue-600 text-white shadow-lg scale-105" : "bg-gray-200 hover:bg-gray-300"
+            }`}
           >
             {type} (${seatPrices[type]})
           </button>
         ))}
       </div>
 
-      {/* Stage Label */}
-      <div className="text-center font-semibold text-lg bg-black text-white py-2 rounded mt-6">
+      {/* Stage */}
+      <div className="text-center font-semibold text-lg bg-gradient-to-r from-gray-800 via-gray-700 to-black text-white py-2 rounded-xl shadow-inner mt-6">
         Stage
       </div>
 
       {/* Seat Grid */}
-      <div className="space-y-2 mt-4 select-none">
+      <div className="mt-4 space-y-2 select-none">
         {seats.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex justify-center gap-2">
+          <div key={rowIndex} className="flex justify-center gap-2 flex-wrap">
             {row.map((seat, colIndex) => {
               const seatLabel = `${String.fromCharCode(65 + rowIndex)}${colIndex + 1}`;
               return (
@@ -191,22 +171,18 @@ const SeatingChart = () => {
                   key={seat.id}
                   onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
                   onMouseOver={() => handleMouseOver(rowIndex, colIndex)}
-                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-semibold transition-colors duration-150 ${
+                  title={seat.status === "selected" ? `${seat.type} ($${seatPrices[seat.type]})` : seat.status}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold transition-all transform ${
                     seat.status === "selected"
                       ? seat.type === "VIP"
-                        ? "bg-yellow-400"
+                        ? "bg-yellow-400 text-black shadow-lg"
                         : seat.type === "Reserved"
-                        ? "bg-red-500"
-                        : "bg-blue-500"
+                        ? "bg-red-500 text-white shadow-lg"
+                        : "bg-blue-500 text-white shadow-lg"
                       : seat.status === "unavailable"
                       ? "bg-gray-600 cursor-not-allowed"
-                      : "bg-gray-300 hover:bg-gray-400"
+                      : "bg-gray-300 hover:bg-gray-400 hover:scale-110"
                   }`}
-                  title={
-                    seat.status === "selected"
-                      ? `${seat.type} ($${seatPrices[seat.type]})`
-                      : seat.status
-                  }
                 >
                   {seatLabel}
                 </button>
@@ -216,47 +192,37 @@ const SeatingChart = () => {
         ))}
       </div>
 
-      {/* Pricing Summary */}
-      <div className="mt-6 border-t pt-6 text-center space-y-2 text-lg">
+      {/* Pricing & Actions */}
+      <div className="mt-8 border-t pt-6 text-center space-y-3 text-lg">
         {selectedSeats.length > 0 && (
           <>
-            <p>
-              <strong>Selected Seats:</strong> {selectedSeats.length}
-            </p>
-            <p>
-              <strong>Subtotal:</strong> ${subtotal}
-            </p>
-            <p>
-              <strong>Service Fee (5%):</strong> ${serviceFee.toFixed(2)}
-            </p>
-            <p className="text-xl font-bold">
-              <strong>Total:</strong> ${total.toFixed(2)}
-            </p>
+            <p><strong>Selected Seats:</strong> {selectedSeats.length}</p>
+            <p><strong>Subtotal:</strong> ${subtotal}</p>
+            <p><strong>Service Fee (5%):</strong> ${serviceFee.toFixed(2)}</p>
+            <p className="text-xl font-bold"><strong>Total:</strong> ${total.toFixed(2)}</p>
           </>
         )}
-
-        {/* Action Buttons */}
-        <div className="flex justify-center gap-4 mt-4">
+        <div className="flex justify-center gap-4 mt-4 flex-wrap">
           <button
             onClick={handleCheckout}
             disabled={selectedSeats.length === 0}
-            className={`px-6 py-3 font-semibold rounded-lg ${
+            className={`px-6 py-3 font-semibold rounded-xl transition-all ${
               selectedSeats.length === 0
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 text-white hover:bg-green-700"
+                : "bg-green-600 text-white hover:bg-green-700 shadow-lg hover:scale-105"
             }`}
           >
             Preview Tickets
           </button>
           <button
             onClick={handleSaveEvent}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg hover:scale-105 transition-transform"
           >
             Save Event
           </button>
           <button
             onClick={handleReset}
-            className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 shadow-lg hover:scale-105 transition-transform"
           >
             Reset Event
           </button>

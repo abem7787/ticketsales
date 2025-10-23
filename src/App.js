@@ -12,7 +12,7 @@ import PaymentPage from "./components/PaymentPage";
 import SeatSelection from "./components/SeatSelection";
 import EventList from "./components/EventList";
 import PaymentForm from "./components/PaymentForm";
-import RewardPointsPage from "./components/RewardPoints"; // ✅ Reward Points Page
+// import RewardPointsPage from "./components/RewardPoints"; // ✅ Reward Points Page
 
 function App() {
   const [events, setEvents] = useState([
@@ -60,7 +60,7 @@ function App() {
       <Route path="/paymentForm" element={<PaymentForm />} />
 
       {/* ✅ Reward Points Route */}
-      <Route path="/reward-points" element={<RewardPointsPage />} />
+      {/* <Route path="/reward-points" element={<RewardPointsPage />} /> */}
 
       <Route
         path="/customer-portal"
@@ -80,7 +80,7 @@ function App() {
 
       {/* ✅ Alternate Routes */}
       <Route path="/seating-chart" element={<SeatingChart />} />
-      <Route path="/points" element={<RewardPointsPage />} />
+      {/* <Route path="/points" element={<RewardPointsPage />} /> */}
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" />} />
