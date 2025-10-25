@@ -1,37 +1,122 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Payment = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { event, selectedSeats, totalPrice } = location.state || {};
+  const [paymentData, setPaymentData] = useState(null);
+  const [form, setForm] = useState({
+    name: "",
+    cardNumber: "",
+    expiry: "",
+    cvv: ""
+  });
+  const [processing, setProcessing] = useState(false);
 
-  if (!event || !selectedSeats) {
-    return <p className="text-center text-white mt-10">No payment data found.</p>;
-  }
+  useEffect(() => {
+    const data = localStorage.getItem("paymentData");
+    if (!data) {
+      alert("No payment data found. Redirecting...");
+      navigate("/seat-selection/:id");
+      return;
 
-  const handlePayment = () => {
-    // Simulate successful payment
-    alert("Payment successful!");
-    navigate("/confirmation", { state: { event, selectedSeats, totalPrice } });
+        
+
+    }
+    setPaymentData(JSON.parse(data));
+  }, [navigate]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  const handlePayment = (e) => {
+    e.preventDefault();
+    const { name, cardNumber, expiry, cvv } = form;
+
+    if (!name || !cardNumber || !expiry || !cvv) {
+      alert("Please fill out all fields");
+      return;
+    }
+
+    setProcessing(true);
+    setTimeout(() => {
+      alert(
+        `Payment Successful!\nSeats: ${paymentData.selectedSeats.map((s) => s.id).join(", ")}\nTotal: $${paymentData.totalPrice}`
+      );
+      localStorage.removeItem("paymentData");
+      navigate("/confirmation", {
+        state: {
+          event: paymentData.event,
+          selectedSeats: paymentData.selectedSeats,
+          totalPrice: paymentData.totalPrice
+        }
+      });
+    }, 2000);
+  };
+
+  if (!paymentData) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
+        <p>Loading payment information...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-900 text-white p-6 flex flex-col items-center">
-      <h2 className="text-2xl font-semibold mb-6">{event.name} - Payment</h2>
+      <h2 className="text-2xl font-bold mb-4">Payment for {paymentData.event.name}</h2>
 
-      <div className="w-full max-w-md bg-gray-800 p-4 rounded-lg mb-4">
-        <h3 className="text-xl mb-2 font-bold">Selected Seats:</h3>
-        <p>{selectedSeats.map((s) => s.id).join(", ")}</p>
-        <h3 className="text-xl mt-4 font-bold">Total: ${totalPrice}</h3>
+      <div className="bg-gray-800 p-4 rounded-lg mb-6 w-full max-w-md">
+        <p>Seats: {paymentData.selectedSeats.map((s) => s.id).join(", ")}</p>
+        <p>Total: ${paymentData.totalPrice}</p>
       </div>
 
-      <button
-        onClick={handlePayment}
-        className="w-full max-w-md py-2 bg-green-600 hover:bg-green-700 rounded-md text-xl"
+      <form
+        onSubmit={handlePayment}
+        className="bg-gray-800 p-6 rounded-lg w-full max-w-md space-y-4"
       >
-        Pay Now
-      </button>
+        <input
+          name="name"
+          placeholder="Cardholder Name"
+          value={form.name}
+          onChange={handleChange}
+          className="w-full p-2 rounded bg-gray-700 text-white"
+        />
+        <input
+          name="cardNumber"
+          placeholder="Card Number"
+          value={form.cardNumber}
+          onChange={handleChange}
+          className="w-full p-2 rounded bg-gray-700 text-white"
+        />
+        <div className="flex gap-4">
+          <input
+            name="expiry"
+            placeholder="MM/YY"
+            value={form.expiry}
+            onChange={handleChange}
+            className="w-full p-2 rounded bg-gray-700 text-white"
+          />
+          <input
+            name="cvv"
+            placeholder="CVV"
+            value={form.cvv}
+            onChange={handleChange}
+            className="w-full p-2 rounded bg-gray-700 text-white"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={processing}
+          className={`w-full py-3 rounded-md font-semibold ${
+            processing ? "bg-gray-600" : "bg-green-600 hover:bg-green-700"
+          }`}
+        >
+          {processing ? "Processing..." : `Pay $${paymentData.totalPrice}`}
+        </button>
+      </form>
     </div>
   );
 };
