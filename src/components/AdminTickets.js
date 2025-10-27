@@ -24,19 +24,19 @@ const dummyTickets = [
     id: 'GHI789',
     customer: 'Bob The Builder',
     event: 'Shakesphere live',
-    confirmation: 'CONF004',
+    confirmation: 'CONF003',
   },
   {
     id: 'GHI789',
     customer: 'Bob Dillon',
     event: 'Art Expo',
-    confirmation: 'CONF005',
+    confirmation: 'CONF003',
   },
   {
     id: 'GHI789',
     customer: 'Bob Moses',
     event: 'Concert',
-    confirmation: 'CONF006',
+    confirmation: 'CONF003',
   },
 ];
 
@@ -55,11 +55,8 @@ const AdminTickets = () => {
             </tr>
           </thead>
           <tbody>
-            {dummyTickets.map((ticket, index) => (
-              <tr
-                key={`${ticket.id}-${index}`} // ✅ Unique key now
-                className="border-t border-slate-700 hover:bg-slate-600 transition"
-              >
+            {dummyTickets.map((ticket) => (
+              <tr key={ticket.id} className="border-t border-slate-700 hover:bg-slate-600 transition">
                 <td className="py-4 px-6">
                   <QRCodeCanvas value={ticket.confirmation} size={64} />
                 </td>

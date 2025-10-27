@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import RewardPoints from "../components/rewardpoints";
+import RewardPoints from "./RewardPoints";
 
 const RewardPointsPage = () => {
   const [subtotal, setSubtotal] = useState(250);
