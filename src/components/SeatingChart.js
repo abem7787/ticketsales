@@ -9,28 +9,27 @@ const seatPatterns = {
   "Wide Layout": { rows: 6, cols: 16 },
 };
 
-const initialSeatPrices = { Standard: 50, VIP: 200, Reserved: 500 };
-
-const createSeats = (rows, cols) => {
+const createSeats = (rows, cols, seatPrices) => {
   return Array.from({ length: rows }, (_, r) =>
     Array.from({ length: cols }, (_, c) => ({
       id: `${r}-${c}`,
       status: "available",
-      type: null,
+      type: "Standard",
+      price: seatPrices["Standard"],
     }))
   );
 };
 
-const SeatingChart = () => {
+const SeatingChart = ({ setEvents }) => {
   const navigate = useNavigate();
 
   const [patternName, setPatternName] = useState("Standard Layout");
   const [seatType, setSeatType] = useState("Standard");
-  const [seatPrices, setSeatPrices] = useState(initialSeatPrices);
+  const [seatPrices, setSeatPrices] = useState({ Standard: 50, VIP: 200, Reserved: 500 });
   const [eventName, setEventName] = useState("Demo Event");
   const [isDragging, setIsDragging] = useState(false);
 
-  const initialSeats = useMemo(() => createSeats(6, 12), []);
+  const initialSeats = useMemo(() => createSeats(6, 12, seatPrices), []);
   const [seats, setSeats] = useState(initialSeats);
 
   useEffect(() => {
@@ -39,6 +38,18 @@ const SeatingChart = () => {
     return () => window.removeEventListener("mouseup", stopDragging);
   }, []);
 
+  // Update all seat prices dynamically when seatPrices changes
+  useEffect(() => {
+    setSeats(prevSeats =>
+      prevSeats.map(row =>
+        row.map(seat => ({
+          ...seat,
+          price: seatPrices[seat.type],
+        }))
+      )
+    );
+  }, [seatPrices]);
+
   const toggleSeat = (rowIndex, colIndex) => {
     setSeats(prevSeats => {
       const updated = prevSeats.map(row => [...row]);
@@ -46,9 +57,11 @@ const SeatingChart = () => {
       if (seat.status === "available") {
         seat.status = "selected";
         seat.type = seatType;
+        seat.price = seatPrices[seatType];
       } else if (seat.status === "selected") {
         seat.status = "available";
-        seat.type = null;
+        seat.type = "Standard";
+        seat.price = seatPrices["Standard"];
       }
       return updated;
     });
@@ -64,57 +77,45 @@ const SeatingChart = () => {
   };
 
   const selectedSeats = seats.flat().filter(seat => seat.status === "selected");
-  const subtotal = selectedSeats.reduce((sum, seat) => sum + seatPrices[seat.type], 0);
+  const subtotal = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
   const serviceFee = subtotal * serviceFeePercentage;
   const total = subtotal + serviceFee;
 
   const handlePatternChange = newPattern => {
     setPatternName(newPattern);
     const { rows, cols } = seatPatterns[newPattern];
-    setSeats(createSeats(rows, cols));
-  };
-
-  const handleSaveEvent = () => {
-    localStorage.setItem("eventConfig", JSON.stringify({ eventName, seatPrices, seats, patternName }));
-    alert("✅ Event saved successfully!");
-  };
-
-  const handleReset = () => {
-    const { rows, cols } = seatPatterns[patternName];
-    setSeats(createSeats(rows, cols));
-    alert("🔄 Event reset complete!");
+    setSeats(createSeats(rows, cols, seatPrices));
   };
 
   const handleCheckout = () => {
     if (!selectedSeats.length) return;
 
-    const tickets = selectedSeats.map(seat => {
-      const [rowIndex, colIndex] = seat.id.split("-").map(Number);
-      const seatLabel = `${String.fromCharCode(65 + rowIndex)}${colIndex + 1}`;
-      const ticketId = `${seat.id}-${Date.now()}`;
-      return {
-        id: ticketId,
-        seat: seatLabel,
-        type: seat.type,
-        price: seatPrices[seat.type],
-        event: eventName,
-        qrData: JSON.stringify({
-          id: ticketId,
-          seat: seatLabel,
-          price: seatPrices[seat.type],
-          event: eventName,
-        }),
-      };
+    const seatDataToSend = seats.flat().map(seat => ({
+      id: seat.id,
+      type: seat.type,
+      price: seat.price,
+      status: seat.status,
+    }));
+
+    console.log("✅ Seat Data Sent to App.js:", {
+      eventName,
+      patternName,
+      seatDataToSend,
     });
 
-    navigate("/tickets", { state: { tickets, subtotal, serviceFee, total } });
+    setEvents(prev => [
+      ...prev,
+      { eventIndex: prev.length + 1, name: eventName, seats: seatDataToSend },
+    ]);
+
+    navigate("/seat-selection");
   };
 
   return (
     <div className="p-8 max-w-7xl mx-auto bg-gray-50 rounded-3xl shadow-2xl space-y-8">
       <h2 className="text-3xl font-bold text-center text-gray-800">{eventName} - Admin Seating</h2>
 
-      {/* Event Input */}
+      {/* Event Name */}
       <div className="flex justify-center mt-4">
         <input
           type="text"
@@ -137,6 +138,26 @@ const SeatingChart = () => {
           >
             {pattern}
           </button>
+        ))}
+      </div>
+
+      {/* Seat Price Editor */}
+      <div className="flex justify-center mt-6 gap-6 flex-wrap">
+        {["Standard", "VIP", "Reserved"].map(type => (
+          <div key={type} className="flex flex-col items-center">
+            <label className="font-medium">{type} Price</label>
+            <input
+              type="number"
+              value={seatPrices[type]}
+              onChange={e =>
+                setSeatPrices(prev => ({
+                  ...prev,
+                  [type]: Number(e.target.value),
+                }))
+              }
+              className="border p-2 rounded-xl w-20 text-center"
+            />
+          </div>
         ))}
       </div>
 
@@ -171,7 +192,7 @@ const SeatingChart = () => {
                   key={seat.id}
                   onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
                   onMouseOver={() => handleMouseOver(rowIndex, colIndex)}
-                  title={seat.status === "selected" ? `${seat.type} ($${seatPrices[seat.type]})` : seat.status}
+                  title={`${seat.type} ($${seat.price}) - ${seat.status}`}
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold transition-all transform ${
                     seat.status === "selected"
                       ? seat.type === "VIP"
@@ -179,8 +200,6 @@ const SeatingChart = () => {
                         : seat.type === "Reserved"
                         ? "bg-red-500 text-white shadow-lg"
                         : "bg-blue-500 text-white shadow-lg"
-                      : seat.status === "unavailable"
-                      ? "bg-gray-600 cursor-not-allowed"
                       : "bg-gray-300 hover:bg-gray-400 hover:scale-110"
                   }`}
                 >
@@ -212,19 +231,7 @@ const SeatingChart = () => {
                 : "bg-green-600 text-white hover:bg-green-700 shadow-lg hover:scale-105"
             }`}
           >
-            Preview Tickets
-          </button>
-          <button
-            onClick={handleSaveEvent}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg hover:scale-105 transition-transform"
-          >
-            Save Event
-          </button>
-          <button
-            onClick={handleReset}
-            className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 shadow-lg hover:scale-105 transition-transform"
-          >
-            Reset Event
+            Send Seats to App.js
           </button>
         </div>
       </div>
