@@ -1,81 +1,119 @@
+// server.js
 import express from "express";
 import cors from "cors";
-import cookieParser from "cookie-parser";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import mysql from "mysql2";
 
 const app = express();
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
-app.use(cookieParser());
 
-// Allow requests from React frontend
-const allowedOrigins = [
- "http://localhost:3000", // 👈 add this
-  "http://localhost:3002",
-  "http://localhost:3003",
-  "http://10.5.0.2:3002"
-];
-app.use(cors({
-  origin: function(origin, callback){
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true, // required for cookies/auth headers
-}));
-
-// Handle preflight OPTIONS requests for all routes
-app.options("*", cors({ origin: allowedOrigins, credentials: true }));
-
-// In-memory "database" for demo
-const users = [];
-
-// JWT helper
-const JWT_SECRET = "supersecret";
-function signAuthToken(userId) {
-  return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: "7d" });
-}
-
-// Register endpoint
-app.post("/api/auth/register", async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) return res.status(400).json({ error: "All fields required" });
-
-  const exists = users.find(u => u.email === email.toLowerCase());
-  if (exists) return res.status(409).json({ error: "Email already exists" });
-
-  const hashed = await bcrypt.hash(password, 12);
-  const user = { id: users.length + 1, name, email: email.toLowerCase(), password: hashed };
-  users.push(user);
-
-  const token = signAuthToken(user.id);
-  res.cookie("token", token, { httpOnly: true, sameSite: "lax", secure: false });
-  res.status(201).json({ user: { id: user.id, name: user.name, email: user.email } });
+// ✅ MySQL Database Connection
+const db = mysql.createConnection({
+  host: "127.0.0.1",
+  user: "tickets_user",
+  password: "AppPass123!",
+  database: "tickets",
+  port: 3306
 });
 
-// Login endpoint
-app.post("/api/auth/login", async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: "Email and password required" });
-
-  const user = users.find(u => u.email === email.toLowerCase());
-  if (!user) return res.status(401).json({ error: "Invalid email or password" });
-
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(401).json({ error: "Invalid email or password" });
-
-  const token = signAuthToken(user.id);
-  res.cookie("token", token, { httpOnly: true, sameSite: "lax", secure: false });
-  res.json({ user: { id: user.id, name: user.name, email: user.email } });
+db.connect(err => {
+  if (err) console.error("❌ DB connection failed:", err.message);
+  else console.log("✅ MySQL Connected!");
 });
 
-// Optional: logout endpoint
-app.post("/api/auth/logout", (req, res) => {
-  res.clearCookie("token", { httpOnly: true, sameSite: "lax", secure: false });
-  res.json({ message: "Logged out" });
+// ✅ POST route — create new event with seats
+app.post("/api/events", (req, res) => {
+  const { eventName, patternName, seatPrices, seats } = req.body;
+
+  if (!eventName || !patternName || !seats) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  // Generate a BIGINT timestamp ID
+  const eventId = Date.now(); // e.g. 1762217669171
+
+  const insertEvent = "INSERT INTO events (id, name, pattern_name) VALUES (?, ?, ?)";
+  db.query(insertEvent, [eventId, eventName, patternName], (err) => {
+    if (err) return res.status(500).json({ message: "DB error inserting event" });
+
+    // Flatten seats and prepare bulk insert
+    const seatValues = [];
+    seats.forEach((row, rowIndex) => {
+      row.forEach((seat, colIndex) => {
+        let seatColor = "blue";
+        if (seat.type === "VIP") seatColor = "yellow";
+        else if (seat.type === "Reserved") seatColor = "red";
+
+        seatValues.push([
+          eventId, // use custom BIGINT ID here
+          rowIndex,
+          colIndex,
+          seat.label,
+          seat.type || "Standard",
+          seat.price || 0,
+          seat.status || "available",
+          seatColor
+        ]);
+      });
+    });
+
+    const insertSeats = `
+      INSERT INTO seats
+      (event_id, row_index, col_index, seat_label, type, price, status, color)
+      VALUES ?
+    `;
+    db.query(insertSeats, [seatValues], err2 => {
+      if (err2) return res.status(500).json({ message: "DB error inserting seats" });
+      res.status(201).json({ message: "Event and seats saved!", eventId });
+    });
+  });
 });
 
+// ✅ GET route — fetch a specific event with seats
+app.get("/api/events/:id", (req, res) => {
+  const eventId = req.params.id;
+
+  const eventQuery = "SELECT * FROM events WHERE id = ?";
+  db.query(eventQuery, [eventId], (err, eventResult) => {
+    if (err) return res.status(500).json({ message: "DB error fetching event" });
+    if (eventResult.length === 0) return res.status(404).json({ message: "Event not found" });
+
+    const event = eventResult[0];
+
+    const seatsQuery = "SELECT * FROM seats WHERE event_id = ? ORDER BY row_index, col_index";
+    db.query(seatsQuery, [eventId], (err2, seatsResult) => {
+      if (err2) return res.status(500).json({ message: "DB error fetching seats" });
+
+      // Convert to 2D array by row_index
+      const seats2D = [];
+      seatsResult.forEach(seat => {
+        if (!seats2D[seat.row_index]) seats2D[seat.row_index] = [];
+        seats2D[seat.row_index][seat.col_index] = {
+          label: seat.seat_label,
+          type: seat.type,
+          price: seat.price,
+          status: seat.status,
+          color: seat.color
+        };
+      });
+
+      res.json({
+        eventName: event.name,
+        patternName: event.pattern_name,
+        seats: seats2D
+      });
+    });
+  });
+});
+
+// ✅ GET all events (optional)
+app.get("/api/events", (req, res) => {
+  db.query("SELECT * FROM events", (err, result) => {
+    if (err) return res.status(500).json({ message: "DB error fetching events" });
+    res.json(result);
+  });
+});
+
+// Start server
 const port = 5000;
-app.listen(port, () => console.log(`API running at http://localhost:${port}`));
+app.listen(port, () => console.log(`✅ Server running at http://localhost:${port}`));
